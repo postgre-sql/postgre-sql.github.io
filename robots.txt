@@ -1,0 +1,10 @@
+# robots.txt for https://postgre-sql.github.io/
+# Last-Modified: 2026-05-01T13:31:04Z
+
+User-agent: *
+Allow: /
+
+# Canonical home
+# https://postgre-sql.github.io/
+
+Sitemap: https://postgre-sql.github.io/sitemap.xml
