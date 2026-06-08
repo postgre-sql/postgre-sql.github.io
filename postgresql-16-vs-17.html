@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PostgreSQL 16 vs 17 vs 18 on Windows — Version Comparison and Upgrade Guide</title>
+  <meta name="description" content="Compare PostgreSQL 16, 17 and 18 for Windows. New features, end-of-life dates, which version to install, and when to upgrade your existing PostgreSQL on Windows.">
+  <link rel="canonical" href="https://postgre-sql.github.io/postgresql-16-vs-17.html">
+  <meta name="last-modified" content="2026-06-08">
+  <meta property="og:title" content="PostgreSQL 16 vs 17 vs 18 on Windows — Version Comparison and Upgrade Guide">
+  <meta property="og:description" content="Compare PostgreSQL 16, 17 and 18 for Windows. New features, end-of-life dates, which version to install, and when to upgrade your existing PostgreSQL on Windows.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://postgre-sql.github.io/postgresql-16-vs-17.html">
+  <meta property="og:image" content="https://postgre-sql.github.io/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav class="site-nav"><div class="wrap"><div class="nav-inner">
+  <a href="/index.html" class="nav-logo"><div class="nav-logo-mark">Pg</div><span class="nav-logo-name">PostgreSQL</span><span class="nav-logo-sub">for Windows</span></a>
+  <div class="nav-links">
+    <a href="/index.html" id="nl-home">Home</a>
+    <a href="/download-windows.html" id="nl-dl">Download</a>
+    <a href="/offline-installer.html" id="nl-off">Offline</a>
+    <a href="/configure-windows-service.html" id="nl-svc">Service</a>
+    <a href="/fix-path-issues.html" id="nl-path">PATH fix</a>
+    <a href="/pgadmin-windows.html" id="nl-pgadmin">pgAdmin</a>
+    <a href="/postgresql-windows-faq.html" id="nl-faq">FAQ</a>
+  </div>
+  <a href="/download-windows.html" class="nav-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+</div></div></nav>
+<div class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="/index.html">home</a> <span>/</span> <span>postgresql-16-vs-17</span></nav>
+  <span class="page-tag">Version guide</span>
+  <h1>PostgreSQL 16 vs 17 vs 18 on Windows &mdash; <span>version comparison</span></h1>
+  <p class="page-lead">Which PostgreSQL version should you install on Windows? Compare features, support timelines and end-of-life dates for PostgreSQL 16, 17 and 18.</p>
+  
+</div></div>
+<div class="wrap"><div class="content-layout">
+  <main><div class="callout callout-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>For new installations, always use the latest stable release. For existing deployments, stay on your current major version and apply minor updates promptly.</span></div>
+<div class="section" aria-labelledby="rec-h2"><span class="section-label">Quick recommendation</span><h2 id="rec-h2">Which version should I install?</h2>
+<p>If you are starting fresh on Windows today, install <strong>PostgreSQL 18</strong>. It is the latest stable release with the longest support horizon (until November 2029) and the newest features. PostgreSQL 16 and 17 are still fully supported but will reach end-of-life sooner.</p>
+<div class="callout callout-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>New installation &rarr; PostgreSQL 18. Existing deployment on 16/17 &rarr; stay on your version, plan upgrade within the next 1-2 years.</span></div>
+</div>
+<div class="section" aria-labelledby="compare-h2"><span class="section-label">Version comparison</span><h2 id="compare-h2">PostgreSQL 16 vs 17 vs 18 on Windows</h2>
+<div class="tbl-wrap"><table><thead><tr><th>Feature / aspect</th><th>PG 16</th><th>PG 17</th><th>PG 18</th></tr></thead><tbody>
+<tr><td><strong>Release date</strong></td><td>Sept 2023</td><td>Oct 2024</td><td>May 2026</td></tr>
+<tr><td><strong>End of life</strong></td><td>Nov 2028</td><td>Nov 2029</td><td>Nov 2030</td></tr>
+<tr><td><strong>Status</strong></td><td>Supported</td><td>Supported</td><td><strong>Latest</strong></td></tr>
+<tr><td><strong>Logical replication</strong></td><td>Improved</td><td>Enhanced</td><td>Full bidirectional</td></tr>
+<tr><td><strong>JSON support</strong></td><td>Good</td><td>Better</td><td>Excellent</td></tr>
+<tr><td><strong>Parallel query</strong></td><td>Good</td><td>Improved</td><td>Further improved</td></tr>
+<tr><td><strong>Vacuum improvements</strong></td><td>Standard</td><td>Enhanced</td><td>Significant</td></tr>
+<tr><td><strong>Windows installer</strong></td><td>EDB 16.x</td><td>EDB 17.x</td><td>EDB 18.x</td></tr>
+<tr><td><strong>pgAdmin bundled</strong></td><td>4.x</td><td>4.x</td><td>4.x</td></tr>
+</tbody></table></div>
+</div>
+<div class="section" aria-labelledby="pg18-h2"><span class="section-label">PostgreSQL 18 highlights</span><h2 id="pg18-h2">What is new in PostgreSQL 18?</h2>
+<ul>
+<li><strong>Asynchronous I/O</strong> &mdash; significantly improved I/O throughput, especially on Windows with its different I/O model</li>
+<li><strong>Virtual generated columns</strong> &mdash; computed columns that do not require storage</li>
+<li><strong>OAuth authentication</strong> &mdash; native OAuth 2.0 support for client authentication</li>
+<li><strong>Improved JSON</strong> &mdash; more JSON functions and better performance</li>
+<li><strong>pg_basebackup improvements</strong> &mdash; faster and more reliable physical backups</li>
+<li><strong>Vacuum optimisations</strong> &mdash; reduced table bloat and faster autovacuum</li>
+</ul>
+</div>
+<div class="section" aria-labelledby="pg17-h2"><span class="section-label">PostgreSQL 17 highlights</span><h2 id="pg17-h2">What is new in PostgreSQL 17?</h2>
+<ul>
+<li><strong>MERGE improvements</strong> &mdash; RETURNING clause support and WHEN NOT MATCHED BY SOURCE</li>
+<li><strong>Incremental backup</strong> &mdash; pg_basebackup now supports incremental backups</li>
+<li><strong>Faster vacuum</strong> &mdash; up to 20x faster on tables with many dead tuples</li>
+<li><strong>JSON_TABLE</strong> &mdash; SQL/JSON table function for converting JSON to rows</li>
+<li><strong>COPY improvements</strong> &mdash; COPY FROM now supports ON_ERROR IGNORE</li>
+</ul>
+</div>
+<div class="section" aria-labelledby="eol-h2"><span class="section-label">End of life schedule</span><h2 id="eol-h2">Support timeline for Windows</h2>
+<div class="tbl-wrap"><table><thead><tr><th>Version</th><th>Released</th><th>End of Life</th><th>Action needed</th></tr></thead><tbody>
+<tr><td><strong>18</strong></td><td>May 2026</td><td class="td-ok">Nov 2030</td><td>Recommended for new installs</td></tr>
+<tr><td>17</td><td>Oct 2024</td><td class="td-ok">Nov 2029</td><td>Continue using, plan upgrade to 18 by 2029</td></tr>
+<tr><td>16</td><td>Sept 2023</td><td>Nov 2028</td><td>Continue using, plan upgrade</td></tr>
+<tr><td>15</td><td>Oct 2022</td><td>Nov 2027</td><td>Plan upgrade soon</td></tr>
+<tr><td>14</td><td>Sept 2021</td><td class="td-warn">Nov 2026</td><td>Upgrade urgently &mdash; EOL this year</td></tr>
+<tr><td>13 and older</td><td>&mdash;</td><td class="td-warn">Already EOL</td><td>Upgrade immediately</td></tr>
+</tbody></table></div>
+</div>
+<div class="section" aria-labelledby="faq-h2"><span class="section-label">FAQ</span><h2 id="faq-h2">Version questions</h2><div class="faq">
+<div class="faq-item"><details><summary>Can I run PostgreSQL 16 and 18 on the same Windows machine?</summary><div class="faq-ans">Yes. Each major version installs to its own directory and uses a different port by default (the installer assigns 5432 to the first install, then 5433 for the second, etc.). Both services can run simultaneously.</div></details></div>
+<div class="faq-item"><details><summary>Is upgrading from 16 to 18 safe?</summary><div class="faq-ans">Yes, with preparation. Back up all databases first with pg_dumpall. Then either use the dump/restore method or pg_upgrade. Never skip the backup step. See <a href="/migrate-from-older-versions.html">Upgrade guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>Do minor versions (16.1, 16.2, etc.) require data migration?</summary><div class="faq-ans">No. Minor version upgrades (e.g. 17.3 to 17.4) are safe to apply by simply running the new installer over the existing one. The data directory and format do not change between minor versions.</div></details></div>
+</div></div>
+<div class="cta-banner"><div><h2>Ready to upgrade?</h2><p>Safe step-by-step upgrade guide for PostgreSQL on Windows.</p></div><a href="/migrate-from-older-versions.html" class="btn-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Upgrade guide</a></div>
+<div style="margin-bottom:32px"><span class="section-label">Related guides</span><div class="rel-grid"><a href="/migrate-from-older-versions.html" class="rel-card"><div class="rel-title">Upgrade guide &rarr;</div><div class="rel-sub">safe migration steps</div></a><a href="/download-windows.html" class="rel-card"><div class="rel-title">Download &rarr;</div><div class="rel-sub">get latest version</div></a><a href="/pg-dump-restore-windows.html" class="rel-card"><div class="rel-title">Backup first &rarr;</div><div class="rel-sub">pg_dump guide</div></a></div></div></main>
+  <aside class="content-sidebar"><div class="sb-card"><div class="version-badge-label">Latest stable</div><div class="version-badge-val">18.3</div><div class="version-badge-sub">Released May 2026</div></div><div class="sb-card"><div class="sb-card-title">Install & setup</div><ul class="sb-links"><li><a href="/download-windows.html">Download PostgreSQL</a></li><li><a href="/offline-installer.html">Offline installer</a></li><li><a href="/configure-windows-service.html">Windows service</a></li><li><a href="/fix-path-issues.html">Fix PATH / psql</a></li><li><a href="/pgadmin-windows.html">pgAdmin 4</a></li><li><a href="/install-postgresql-windows-server.html">Windows Server</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Configuration</div><ul class="sb-links"><li><a href="/postgresql-config-windows.html">postgresql.conf</a></li><li><a href="/postgresql-port-5432.html">Port 5432</a></li><li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li><li><a href="/postgresql-password-windows.html">Reset password</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Tools & help</div><ul class="sb-links"><li><a href="/psql-commands-windows.html">psql commands</a></li><li><a href="/pg-dump-restore-windows.html">Backup & restore</a></li><li><a href="/postgresql-python-windows.html">Python / psycopg2</a></li><li><a href="/odbc-driver-x64-x86.html">ODBC driver</a></li><li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li><li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li><li><a href="/postgresql-windows-faq.html">FAQ</a></li></ul></div></aside>
+</div></div>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><div class="footer-logo-mark">Pg</div><span class="footer-logo-name">PostgreSQL for Windows</span></div>
+      <p class="footer-tagline">Unofficial Windows guide for PostgreSQL &mdash; download, install, configure, troubleshoot.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Install &amp; setup</div>
+      <ul class="footer-links">
+        <li><a href="/download-windows.html">Download PostgreSQL</a></li>
+        <li><a href="/offline-installer.html">Offline installer</a></li>
+        <li><a href="/configure-windows-service.html">Windows service</a></li>
+        <li><a href="/fix-path-issues.html">Fix PATH / psql</a></li>
+        <li><a href="/pgadmin-windows.html">pgAdmin 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Configuration</div>
+      <ul class="footer-links">
+        <li><a href="/postgresql-config-windows.html">postgresql.conf</a></li>
+        <li><a href="/postgresql-port-5432.html">Port 5432</a></li>
+        <li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li>
+        <li><a href="/postgresql-password-windows.html">Reset password</a></li>
+        <li><a href="/install-postgresql-windows-server.html">Windows Server</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tools &amp; help</div>
+      <ul class="footer-links">
+        <li><a href="/psql-commands-windows.html">psql commands</a></li>
+        <li><a href="/pg-dump-restore-windows.html">Backup &amp; restore</a></li>
+        <li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li>
+        <li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li>
+        <li><a href="/postgresql-windows-faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Not affiliated with the PostgreSQL Global Development Group. Unofficial community guide.</p>
+    <p><strong>Affiliate disclosure:</strong> Download links may be partner links.</p>
+  </div>
+</div></footer>
+<div class="cookie-bar" id="cookieBar" style="display:none">
+  <p>We use Google Analytics for anonymous traffic data. <a href="/privacy.html">Privacy policy</a></p>
+  <div class="cookie-btns"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div>
+</div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+gtag('js',new Date());gtag('config','G-MHLW57MR8Q',{anonymize_ip:true,send_page_view:false});
+function grantGA(){gtag('consent','update',{analytics_storage:'granted'});gtag('event','page_view',{page_location:location.href,page_title:document.title})}
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.getElementById('cookieBar');
+  var c=localStorage.getItem('pg_consent');
+  if(!c){bar.style.display='flex'}else if(c==='1'){grantGA()}
+  document.getElementById('cookieAccept').addEventListener('click',function(){localStorage.setItem('pg_consent','1');grantGA();bar.style.display='none'});
+  document.getElementById('cookieDecline').addEventListener('click',function(){localStorage.setItem('pg_consent','0');bar.style.display='none'});
+});
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"PostgreSQL 16 vs 17 vs 18 on Windows","description":"Compare PostgreSQL versions for Windows installation: features, support timeline and upgrade recommendations.","url":"https://postgre-sql.github.io/postgresql-16-vs-17.html"}</script>
+<script>var el=document.getElementById("nl-home");if(el)el.classList.add("active");</script>
+</body></html>

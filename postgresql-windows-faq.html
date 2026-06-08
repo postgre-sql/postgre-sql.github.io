@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PostgreSQL Windows FAQ — Install, psql, Service, Remote Access and Backup</title>
+  <meta name="description" content="All common PostgreSQL Windows questions answered: installation, psql PATH, service management, remote connections, password reset, backups and upgrades.">
+  <link rel="canonical" href="https://postgre-sql.github.io/postgresql-windows-faq.html">
+  <meta name="last-modified" content="2026-06-08">
+  <meta property="og:title" content="PostgreSQL Windows FAQ — Install, psql, Service, Remote Access and Backup">
+  <meta property="og:description" content="All common PostgreSQL Windows questions answered: installation, psql PATH, service management, remote connections, password reset, backups and upgrades.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://postgre-sql.github.io/postgresql-windows-faq.html">
+  <meta property="og:image" content="https://postgre-sql.github.io/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav class="site-nav"><div class="wrap"><div class="nav-inner">
+  <a href="/index.html" class="nav-logo"><div class="nav-logo-mark">Pg</div><span class="nav-logo-name">PostgreSQL</span><span class="nav-logo-sub">for Windows</span></a>
+  <div class="nav-links">
+    <a href="/index.html" id="nl-home">Home</a>
+    <a href="/download-windows.html" id="nl-dl">Download</a>
+    <a href="/offline-installer.html" id="nl-off">Offline</a>
+    <a href="/configure-windows-service.html" id="nl-svc">Service</a>
+    <a href="/fix-path-issues.html" id="nl-path">PATH fix</a>
+    <a href="/pgadmin-windows.html" id="nl-pgadmin">pgAdmin</a>
+    <a href="/postgresql-windows-faq.html" id="nl-faq">FAQ</a>
+  </div>
+  <a href="/download-windows.html" class="nav-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+</div></div></nav>
+<div class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="/index.html">home</a> <span>/</span> <span>postgresql-windows-faq</span></nav>
+  <span class="page-tag">FAQ</span>
+  <h1>PostgreSQL Windows FAQ &mdash; <span>all common questions answered</span></h1>
+  <p class="page-lead">Quick answers to the most common PostgreSQL questions on Windows: download, psql PATH, service management, remote connections, password reset and backups.</p>
+  
+</div></div>
+<div class="wrap"><div class="content-layout">
+  <main><div class="section" id="sec-install"><span class="section-label">Download & install</span><h2>Download & install</h2><div class="faq">
+<div class="faq-item"><details><summary>What is the latest version of PostgreSQL for Windows?</summary><div class="faq-ans">PostgreSQL 18.3 is the latest stable release (May 2026). Download the official EDB installer from <a href="/download-windows.html">the download page</a>. Always use the latest minor release.</div></details></div>
+<div class="faq-item"><details><summary>Is PostgreSQL free on Windows?</summary><div class="faq-ans">Yes. PostgreSQL is released under the PostgreSQL License (similar to BSD/MIT) which allows free personal and commercial use without restrictions. The EDB Windows installer is also free.</div></details></div>
+<div class="faq-item"><details><summary>What is the difference between EDB and the official PostgreSQL installer?</summary><div class="faq-ans">EDB (EnterpriseDB) maintains the official Windows installer available at postgresql.org/download/windows. It is the standard way to install PostgreSQL on Windows and bundles pgAdmin 4 and command-line tools. There is no separate official installer &mdash; EDB is the official Windows distribution.</div></details></div>
+<div class="faq-item"><details><summary>Can I install PostgreSQL without internet access?</summary><div class="faq-ans">Yes. Download the installer on any connected machine, transfer via USB, and run it on the offline machine. The installer is fully self-contained. See <a href="/offline-installer.html">Offline installer guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>Which PostgreSQL version should I install?</summary><div class="faq-ans">For new installations, always install the latest stable release (18.3). If you are upgrading an existing deployment, see <a href="/postgresql-16-vs-17.html">Version comparison guide</a>.</div></details></div>
+</div></div>
+<div class="section" id="sec-path"><span class="section-label">psql & PATH</span><h2>psql & PATH</h2><div class="faq">
+<div class="faq-item"><details><summary>psql is not recognized after installing</summary><div class="faq-ans">Open a <strong>new</strong> Command Prompt or PowerShell window after install. PATH changes only apply to new terminal sessions. If it still fails, see <a href="/fix-path-issues.html">Fix PATH issues</a>.</div></details></div>
+<div class="faq-item"><details><summary>Where is psql.exe located on Windows?</summary><div class="faq-ans">Default location: <code>C:\Program Files\PostgreSQL\18\bin\psql.exe</code>. Adjust the version number for 16 or 17.</div></details></div>
+<div class="faq-item"><details><summary>How do I connect to PostgreSQL with psql?</summary><div class="faq-ans"><code>psql -U postgres</code> connects to the default database. Use <code>psql -U postgres -d mydb -h localhost</code> to specify database and host. See <a href="/psql-commands-windows.html">psql commands guide</a>.</div></details></div>
+</div></div>
+<div class="section" id="sec-service"><span class="section-label">Service & port</span><h2>Service & port</h2><div class="faq">
+<div class="faq-item"><details><summary>How do I start and stop the PostgreSQL service on Windows?</summary><div class="faq-ans"><code>net start postgresql-x64-18</code> to start, <code>net stop postgresql-x64-18</code> to stop. Or use services.msc. See <a href="/configure-windows-service.html">Windows service guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>PostgreSQL service fails to start</summary><div class="faq-ans">Check Windows Event Viewer and the PostgreSQL log in the data/log folder. Most common causes: port 5432 already in use, data directory permissions, or stale postmaster.pid. See <a href="/postgresql-not-starting-windows.html">Service not starting guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>How do I change the PostgreSQL port from 5432?</summary><div class="faq-ans">Edit <code>postgresql.conf</code>, change <code>port = 5432</code> to your desired port, restart the service, and update Windows Firewall if needed. See <a href="/postgresql-port-5432.html">Port 5432 guide</a>.</div></details></div>
+</div></div>
+<div class="section" id="sec-remote"><span class="section-label">Remote access</span><h2>Remote access</h2><div class="faq">
+<div class="faq-item"><details><summary>How do I allow remote connections to PostgreSQL on Windows?</summary><div class="faq-ans">Three steps: (1) set <code>listen_addresses = '*'</code> in postgresql.conf, (2) add a host rule in pg_hba.conf, (3) open port 5432 in Windows Firewall. See <a href="/postgresql-allow-remote-connections.html">Remote connections guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>What is pg_hba.conf and where is it?</summary><div class="faq-ans">pg_hba.conf controls client authentication &mdash; who can connect, from where, and how. Default location: <code>C:\Program Files\PostgreSQL\18\data\pg_hba.conf</code>. See <a href="/postgresql-config-windows.html">Configuration guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>How do I connect to PostgreSQL from Python on Windows?</summary><div class="faq-ans">Install <code>pip install psycopg2-binary</code> and connect: <code>conn = psycopg2.connect(host='localhost', database='mydb', user='postgres', password='pw')</code>. See <a href="/postgresql-python-windows.html">Python guide</a>.</div></details></div>
+</div></div>
+<div class="section" id="sec-security"><span class="section-label">Passwords & security</span><h2>Passwords & security</h2><div class="faq">
+<div class="faq-item"><details><summary>I forgot the postgres superuser password</summary><div class="faq-ans">Reset it via pg_hba.conf trust authentication: stop the service, change pg_hba.conf to trust, start and connect without password, run ALTER USER postgres WITH PASSWORD, restore scram-sha-256. See <a href="/postgresql-password-windows.html">Password reset guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>What is the default postgres password after install?</summary><div class="faq-ans">There is no default. The EDB installer requires you to set a password during setup. If you do not remember it, follow the password reset procedure.</div></details></div>
+</div></div>
+<div class="section" id="sec-backup"><span class="section-label">Backup & upgrade</span><h2>Backup & upgrade</h2><div class="faq">
+<div class="faq-item"><details><summary>How do I back up a PostgreSQL database on Windows?</summary><div class="faq-ans"><code>pg_dump -U postgres -d mydb -F c -f backup.dump</code> backs up one database in compressed format. For all databases: <code>pg_dumpall -U postgres -f all.sql</code>. See <a href="/pg-dump-restore-windows.html">Backup guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>How do I upgrade PostgreSQL on Windows?</summary><div class="faq-ans">Two methods: dump/restore (safer) or pg_upgrade (faster for large databases). Always back up before upgrading. See <a href="/migrate-from-older-versions.html">Upgrade guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>How do I uninstall PostgreSQL completely?</summary><div class="faq-ans">Stop the service, uninstall via Settings > Apps, then manually delete the data directory to free disk space. See <a href="/postgresql-uninstall-windows.html">Uninstall guide</a>.</div></details></div>
+</div></div>
+<div class="cta-banner"><div><h2>Ready to get started?</h2><p>Download the official PostgreSQL installer for Windows 10 and 11.</p></div><a href="/download-windows.html" class="btn-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download guide</a></div>
+<div style="margin-bottom:32px"><span class="section-label">Related guides</span><div class="rel-grid"><a href="/download-windows.html" class="rel-card"><div class="rel-title">Download &rarr;</div><div class="rel-sub">get started</div></a><a href="/fix-path-issues.html" class="rel-card"><div class="rel-title">Fix PATH &rarr;</div><div class="rel-sub">psql not recognized</div></a><a href="/configure-windows-service.html" class="rel-card"><div class="rel-title">Windows service &rarr;</div><div class="rel-sub">service management</div></a></div></div></main>
+  <aside class="content-sidebar"><div class="sb-card"><div class="sb-card-title">Jump to</div><ul class="sb-links"><li><a href="#sec-install">Download & install</a></li><li><a href="#sec-path">psql & PATH</a></li><li><a href="#sec-service">Service & port</a></li><li><a href="#sec-remote">Remote access</a></li><li><a href="#sec-security">Passwords & security</a></li><li><a href="#sec-backup">Backup & upgrade</a></li></ul></div><div class="sb-card"><div class="version-badge-label">Latest stable</div><div class="version-badge-val">18.3</div><div class="version-badge-sub">Released May 2026</div></div><div class="sb-card"><div class="sb-card-title">Install & setup</div><ul class="sb-links"><li><a href="/download-windows.html">Download PostgreSQL</a></li><li><a href="/offline-installer.html">Offline installer</a></li><li><a href="/configure-windows-service.html">Windows service</a></li><li><a href="/fix-path-issues.html">Fix PATH / psql</a></li><li><a href="/pgadmin-windows.html">pgAdmin 4</a></li><li><a href="/install-postgresql-windows-server.html">Windows Server</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Configuration</div><ul class="sb-links"><li><a href="/postgresql-config-windows.html">postgresql.conf</a></li><li><a href="/postgresql-port-5432.html">Port 5432</a></li><li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li><li><a href="/postgresql-password-windows.html">Reset password</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Tools & help</div><ul class="sb-links"><li><a href="/psql-commands-windows.html">psql commands</a></li><li><a href="/pg-dump-restore-windows.html">Backup & restore</a></li><li><a href="/postgresql-python-windows.html">Python / psycopg2</a></li><li><a href="/odbc-driver-x64-x86.html">ODBC driver</a></li><li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li><li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li><li><a href="/postgresql-windows-faq.html">FAQ</a></li></ul></div></aside>
+</div></div>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><div class="footer-logo-mark">Pg</div><span class="footer-logo-name">PostgreSQL for Windows</span></div>
+      <p class="footer-tagline">Unofficial Windows guide for PostgreSQL &mdash; download, install, configure, troubleshoot.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Install &amp; setup</div>
+      <ul class="footer-links">
+        <li><a href="/download-windows.html">Download PostgreSQL</a></li>
+        <li><a href="/offline-installer.html">Offline installer</a></li>
+        <li><a href="/configure-windows-service.html">Windows service</a></li>
+        <li><a href="/fix-path-issues.html">Fix PATH / psql</a></li>
+        <li><a href="/pgadmin-windows.html">pgAdmin 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Configuration</div>
+      <ul class="footer-links">
+        <li><a href="/postgresql-config-windows.html">postgresql.conf</a></li>
+        <li><a href="/postgresql-port-5432.html">Port 5432</a></li>
+        <li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li>
+        <li><a href="/postgresql-password-windows.html">Reset password</a></li>
+        <li><a href="/install-postgresql-windows-server.html">Windows Server</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tools &amp; help</div>
+      <ul class="footer-links">
+        <li><a href="/psql-commands-windows.html">psql commands</a></li>
+        <li><a href="/pg-dump-restore-windows.html">Backup &amp; restore</a></li>
+        <li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li>
+        <li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li>
+        <li><a href="/postgresql-windows-faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Not affiliated with the PostgreSQL Global Development Group. Unofficial community guide.</p>
+    <p><strong>Affiliate disclosure:</strong> Download links may be partner links.</p>
+  </div>
+</div></footer>
+<div class="cookie-bar" id="cookieBar" style="display:none">
+  <p>We use Google Analytics for anonymous traffic data. <a href="/privacy.html">Privacy policy</a></p>
+  <div class="cookie-btns"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div>
+</div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+gtag('js',new Date());gtag('config','G-MHLW57MR8Q',{anonymize_ip:true,send_page_view:false});
+function grantGA(){gtag('consent','update',{analytics_storage:'granted'});gtag('event','page_view',{page_location:location.href,page_title:document.title})}
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.getElementById('cookieBar');
+  var c=localStorage.getItem('pg_consent');
+  if(!c){bar.style.display='flex'}else if(c==='1'){grantGA()}
+  document.getElementById('cookieAccept').addEventListener('click',function(){localStorage.setItem('pg_consent','1');grantGA();bar.style.display='none'});
+  document.getElementById('cookieDecline').addEventListener('click',function(){localStorage.setItem('pg_consent','0');bar.style.display='none'});
+});
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is PostgreSQL free on Windows?","acceptedAnswer":{"@type":"Answer","text":"Yes. PostgreSQL is free under the PostgreSQL License for personal and commercial use."}},{"@type":"Question","name":"psql is not recognized after installing","acceptedAnswer":{"@type":"Answer","text":"Open a new Command Prompt or PowerShell window. PATH changes only apply to new terminal sessions."}},{"@type":"Question","name":"How do I allow remote connections to PostgreSQL on Windows?","acceptedAnswer":{"@type":"Answer","text":"Set listen_addresses = * in postgresql.conf, add a host rule in pg_hba.conf, and open port 5432 in Windows Firewall. Restart the service."}},{"@type":"Question","name":"How do I back up a PostgreSQL database on Windows?","acceptedAnswer":{"@type":"Answer","text":"pg_dump -U postgres -d mydb -F c -f backup.dump"}}]}</script>
+<script>var el=document.getElementById("nl-faq");if(el)el.classList.add("active");</script>
+</body></html>

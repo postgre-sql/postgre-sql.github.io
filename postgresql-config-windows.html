@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PostgreSQL Configuration on Windows — postgresql.conf and pg_hba.conf Guide</title>
+  <meta name="description" content="Configure PostgreSQL on Windows via postgresql.conf and pg_hba.conf. Memory settings, port, listen_addresses, authentication rules and how to apply changes.">
+  <link rel="canonical" href="https://postgre-sql.github.io/postgresql-config-windows.html">
+  <meta name="last-modified" content="2026-06-08">
+  <meta property="og:title" content="PostgreSQL Configuration on Windows — postgresql.conf and pg_hba.conf Guide">
+  <meta property="og:description" content="Configure PostgreSQL on Windows via postgresql.conf and pg_hba.conf. Memory settings, port, listen_addresses, authentication rules and how to apply changes.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://postgre-sql.github.io/postgresql-config-windows.html">
+  <meta property="og:image" content="https://postgre-sql.github.io/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav class="site-nav"><div class="wrap"><div class="nav-inner">
+  <a href="/index.html" class="nav-logo"><div class="nav-logo-mark">Pg</div><span class="nav-logo-name">PostgreSQL</span><span class="nav-logo-sub">for Windows</span></a>
+  <div class="nav-links">
+    <a href="/index.html" id="nl-home">Home</a>
+    <a href="/download-windows.html" id="nl-dl">Download</a>
+    <a href="/offline-installer.html" id="nl-off">Offline</a>
+    <a href="/configure-windows-service.html" id="nl-svc">Service</a>
+    <a href="/fix-path-issues.html" id="nl-path">PATH fix</a>
+    <a href="/pgadmin-windows.html" id="nl-pgadmin">pgAdmin</a>
+    <a href="/postgresql-windows-faq.html" id="nl-faq">FAQ</a>
+  </div>
+  <a href="/download-windows.html" class="nav-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+</div></div></nav>
+<div class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="/index.html">home</a> <span>/</span> <span>postgresql-config-windows</span></nav>
+  <span class="page-tag">Config guide</span>
+  <h1>PostgreSQL configuration on Windows &mdash; <span>postgresql.conf &amp; pg_hba.conf</span></h1>
+  <p class="page-lead">Configure PostgreSQL on Windows through postgresql.conf (server settings) and pg_hba.conf (authentication rules). Covers key settings, memory tuning, editing and applying changes.</p>
+  
+</div></div>
+<div class="wrap"><div class="content-layout">
+  <main><div class="section" aria-labelledby="what-h2"><span class="section-label">Overview</span><h2 id="what-h2">PostgreSQL configuration files on Windows</h2>
+<p>PostgreSQL on Windows is configured through two main files located in the data directory: <code>postgresql.conf</code> controls server behaviour (memory, connections, logging, port) and <code>pg_hba.conf</code> controls client authentication (who can connect and how). Both files are plain text and can be edited with any text editor.</p>
+<p>The default data directory is <code>C:\Program Files\PostgreSQL\18\data</code>. Always back up both files before editing.</p>
+</div>
+<div class="section" aria-labelledby="find-h2"><span class="section-label">Find the files</span><h2 id="find-h2">Locate postgresql.conf and pg_hba.conf</h2>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">psql</span></div><div class="term-body"><div><span class="t-cm">-- Find data directory from psql:</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">SHOW data_directory;</span></div><div><span class="t-v">           data_directory</span></div><div><span class="t-v">----------------------------------</span></div><div><span class="t-v"> C:/Program Files/PostgreSQL/18/data</span></div><div></div><div><span class="t-cm">-- Or find config file directly:</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">SHOW config_file;</span></div><div><span class="t-v"> C:/Program Files/PostgreSQL/18/data/postgresql.conf</span></div></div></div>
+</div>
+<div class="section" aria-labelledby="key-h2"><span class="section-label">Key settings</span><h2 id="key-h2">Essential postgresql.conf settings for Windows</h2>
+<div class="tbl-wrap"><table><thead><tr><th>Setting</th><th>Default</th><th>What it does</th></tr></thead><tbody>
+<tr><td><code>port</code></td><td>5432</td><td>TCP port PostgreSQL listens on</td></tr>
+<tr><td><code>max_connections</code></td><td>100</td><td>Maximum simultaneous client connections</td></tr>
+<tr><td><code>shared_buffers</code></td><td>128MB</td><td>Memory for shared buffer cache (set to 25% of RAM)</td></tr>
+<tr><td><code>work_mem</code></td><td>4MB</td><td>Memory per sort/hash operation</td></tr>
+<tr><td><code>listen_addresses</code></td><td>localhost</td><td>Which IPs to accept connections on</td></tr>
+<tr><td><code>log_directory</code></td><td>log</td><td>Log file subdirectory under data dir</td></tr>
+<tr><td><code>log_filename</code></td><td>postgresql-%Y-%m-%d.log</td><td>Log file naming pattern</td></tr>
+</tbody></table></div>
+</div>
+<div class="section" aria-labelledby="edit-h2"><span class="section-label">Edit & apply</span><h2 id="edit-h2">How to edit postgresql.conf and apply changes</h2>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">PowerShell &mdash; Administrator</span></div><div class="term-body"><div><span class="t-cm"># Open postgresql.conf in Notepad:</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">notepad "C:\Program Files\PostgreSQL\18\data\postgresql.conf"</span></div><div></div><div><span class="t-cm"># After saving, reload config without restart:</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">& "C:\Program Files\PostgreSQL\18\bin\pg_ctl.exe" reload -D "C:\Program Files\PostgreSQL\18\data"</span></div><div></div><div><span class="t-cm"># Or from psql:</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">SELECT pg_reload_conf();</span></div><div><span class="t-v"> pg_reload_conf</span></div><div><span class="t-ok"> t</span></div></div></div>
+<div class="callout callout-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Some settings (like <code>port</code> and <code>shared_buffers</code>) require a full service restart to take effect, not just a reload.</span></div>
+</div>
+<div class="section" aria-labelledby="hba-h2"><span class="section-label">pg_hba.conf</span><h2 id="hba-h2">Configure client authentication with pg_hba.conf</h2>
+<p>pg_hba.conf controls which hosts can connect, which users, to which databases, and with what authentication method. Each line is a rule. Lines are checked top to bottom &mdash; first match wins.</p>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">pg_hba.conf format</span></div><div class="term-body"><div><span class="t-cm"># TYPE  DATABASE  USER  ADDRESS       METHOD</span></div><div><span class="t-v">local   all       all                  scram-sha-256</span></div><div><span class="t-v">host    all       all  127.0.0.1/32   scram-sha-256</span></div><div><span class="t-v">host    all       all  ::1/128        scram-sha-256</span></div><div></div><div><span class="t-cm"># Allow specific user from specific IP:</span></div><div><span class="t-v">host    mydb      myuser  192.168.1.0/24  scram-sha-256</span></div></div></div>
+<p>After editing pg_hba.conf, reload the configuration with <code>SELECT pg_reload_conf();</code> in psql.</p>
+</div>
+<div class="section" aria-labelledby="memory-h2"><span class="section-label">Memory tuning</span><h2 id="memory-h2">Recommended memory settings for Windows</h2>
+<div class="tbl-wrap"><table><thead><tr><th>System RAM</th><th>shared_buffers</th><th>work_mem</th><th>max_connections</th></tr></thead><tbody>
+<tr><td>4 GB</td><td>1GB</td><td>16MB</td><td>50</td></tr>
+<tr><td>8 GB</td><td>2GB</td><td>32MB</td><td>100</td></tr>
+<tr><td>16 GB</td><td>4GB</td><td>64MB</td><td>200</td></tr>
+<tr><td>32 GB</td><td>8GB</td><td>128MB</td><td>300</td></tr>
+</tbody></table></div>
+<div class="callout callout-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>On Windows, <code>shared_buffers</code> above 512MB may require adjusting the <code>max_map_count</code> equivalent. The EDB installer handles this automatically for recommended values.</span></div>
+</div>
+<div class="section" aria-labelledby="faq-h2"><span class="section-label">FAQ</span><h2 id="faq-h2">Configuration questions</h2><div class="faq">
+<div class="faq-item"><details><summary>Changes to postgresql.conf not taking effect</summary><div class="faq-ans">First try <code>SELECT pg_reload_conf();</code> in psql. If the setting shows the old value in <code>SHOW setting_name;</code>, it requires a full service restart: <code>net stop postgresql-x64-18 &amp;&amp; net start postgresql-x64-18</code>.</div></details></div>
+<div class="faq-item"><details><summary>How do I check what the current value of a setting is?</summary><div class="faq-ans">In psql: <code>SHOW setting_name;</code> for example <code>SHOW max_connections;</code>. To see all settings: <code>SELECT name, setting, unit FROM pg_settings ORDER BY name;</code></div></details></div>
+<div class="faq-item"><details><summary>postgresql.conf vs ALTER SYSTEM &mdash; which to use?</summary><div class="faq-ans"><code>ALTER SYSTEM</code> writes to <code>postgresql.auto.conf</code> which overrides <code>postgresql.conf</code>. Both are valid. <code>ALTER SYSTEM</code> is more convenient but edits only one setting at a time. For bulk changes, editing <code>postgresql.conf</code> directly is clearer.</div></details></div>
+</div></div>
+<div class="cta-banner"><div><h2>Need to allow remote connections?</h2><p>Configure pg_hba.conf and firewall for network access.</p></div><a href="/postgresql-allow-remote-connections.html" class="btn-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Remote connections</a></div>
+<div style="margin-bottom:32px"><span class="section-label">Related guides</span><div class="rel-grid"><a href="/postgresql-allow-remote-connections.html" class="rel-card"><div class="rel-title">Remote connections &rarr;</div><div class="rel-sub">pg_hba.conf + firewall</div></a><a href="/postgresql-port-5432.html" class="rel-card"><div class="rel-title">Port 5432 &rarr;</div><div class="rel-sub">change port</div></a><a href="/configure-windows-service.html" class="rel-card"><div class="rel-title">Windows service &rarr;</div><div class="rel-sub">restart service</div></a></div></div></main>
+  <aside class="content-sidebar"><div class="sb-card"><div class="version-badge-label">Latest stable</div><div class="version-badge-val">18.3</div><div class="version-badge-sub">Released May 2026</div></div><div class="sb-card"><div class="sb-card-title">Install & setup</div><ul class="sb-links"><li><a href="/download-windows.html">Download PostgreSQL</a></li><li><a href="/offline-installer.html">Offline installer</a></li><li><a href="/configure-windows-service.html">Windows service</a></li><li><a href="/fix-path-issues.html">Fix PATH / psql</a></li><li><a href="/pgadmin-windows.html">pgAdmin 4</a></li><li><a href="/install-postgresql-windows-server.html">Windows Server</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Configuration</div><ul class="sb-links"><li><a href="/postgresql-config-windows.html" class="cur">postgresql.conf</a></li><li><a href="/postgresql-port-5432.html">Port 5432</a></li><li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li><li><a href="/postgresql-password-windows.html">Reset password</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Tools & help</div><ul class="sb-links"><li><a href="/psql-commands-windows.html">psql commands</a></li><li><a href="/pg-dump-restore-windows.html">Backup & restore</a></li><li><a href="/postgresql-python-windows.html">Python / psycopg2</a></li><li><a href="/odbc-driver-x64-x86.html">ODBC driver</a></li><li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li><li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li><li><a href="/postgresql-windows-faq.html">FAQ</a></li></ul></div></aside>
+</div></div>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><div class="footer-logo-mark">Pg</div><span class="footer-logo-name">PostgreSQL for Windows</span></div>
+      <p class="footer-tagline">Unofficial Windows guide for PostgreSQL &mdash; download, install, configure, troubleshoot.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Install &amp; setup</div>
+      <ul class="footer-links">
+        <li><a href="/download-windows.html">Download PostgreSQL</a></li>
+        <li><a href="/offline-installer.html">Offline installer</a></li>
+        <li><a href="/configure-windows-service.html">Windows service</a></li>
+        <li><a href="/fix-path-issues.html">Fix PATH / psql</a></li>
+        <li><a href="/pgadmin-windows.html">pgAdmin 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Configuration</div>
+      <ul class="footer-links">
+        <li><a href="/postgresql-config-windows.html">postgresql.conf</a></li>
+        <li><a href="/postgresql-port-5432.html">Port 5432</a></li>
+        <li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li>
+        <li><a href="/postgresql-password-windows.html">Reset password</a></li>
+        <li><a href="/install-postgresql-windows-server.html">Windows Server</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tools &amp; help</div>
+      <ul class="footer-links">
+        <li><a href="/psql-commands-windows.html">psql commands</a></li>
+        <li><a href="/pg-dump-restore-windows.html">Backup &amp; restore</a></li>
+        <li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li>
+        <li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li>
+        <li><a href="/postgresql-windows-faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Not affiliated with the PostgreSQL Global Development Group. Unofficial community guide.</p>
+    <p><strong>Affiliate disclosure:</strong> Download links may be partner links.</p>
+  </div>
+</div></footer>
+<div class="cookie-bar" id="cookieBar" style="display:none">
+  <p>We use Google Analytics for anonymous traffic data. <a href="/privacy.html">Privacy policy</a></p>
+  <div class="cookie-btns"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div>
+</div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+gtag('js',new Date());gtag('config','G-MHLW57MR8Q',{anonymize_ip:true,send_page_view:false});
+function grantGA(){gtag('consent','update',{analytics_storage:'granted'});gtag('event','page_view',{page_location:location.href,page_title:document.title})}
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.getElementById('cookieBar');
+  var c=localStorage.getItem('pg_consent');
+  if(!c){bar.style.display='flex'}else if(c==='1'){grantGA()}
+  document.getElementById('cookieAccept').addEventListener('click',function(){localStorage.setItem('pg_consent','1');grantGA();bar.style.display='none'});
+  document.getElementById('cookieDecline').addEventListener('click',function(){localStorage.setItem('pg_consent','0');bar.style.display='none'});
+});
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"PostgreSQL Configuration on Windows","description":"How to configure PostgreSQL on Windows via postgresql.conf and pg_hba.conf.","url":"https://postgre-sql.github.io/postgresql-config-windows.html"}</script>
+<script>var el=document.getElementById("nl-home");if(el)el.classList.add("active");</script>
+</body></html>

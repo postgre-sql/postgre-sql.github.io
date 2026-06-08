@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>pg_dump and pg_restore on Windows — PostgreSQL Backup & Restore Guide</title>
+  <meta name="description" content="How to back up and restore PostgreSQL databases on Windows using pg_dump and pg_restore. Formats, scheduled backups with Task Scheduler, and troubleshooting.">
+  <link rel="canonical" href="https://postgre-sql.github.io/pg-dump-restore-windows.html">
+  <meta name="last-modified" content="2026-06-08">
+  <meta property="og:title" content="pg_dump and pg_restore on Windows — PostgreSQL Backup & Restore Guide">
+  <meta property="og:description" content="How to back up and restore PostgreSQL databases on Windows using pg_dump and pg_restore. Formats, scheduled backups with Task Scheduler, and troubleshooting.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://postgre-sql.github.io/pg-dump-restore-windows.html">
+  <meta property="og:image" content="https://postgre-sql.github.io/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav class="site-nav"><div class="wrap"><div class="nav-inner">
+  <a href="/index.html" class="nav-logo"><div class="nav-logo-mark">Pg</div><span class="nav-logo-name">PostgreSQL</span><span class="nav-logo-sub">for Windows</span></a>
+  <div class="nav-links">
+    <a href="/index.html" id="nl-home">Home</a>
+    <a href="/download-windows.html" id="nl-dl">Download</a>
+    <a href="/offline-installer.html" id="nl-off">Offline</a>
+    <a href="/configure-windows-service.html" id="nl-svc">Service</a>
+    <a href="/fix-path-issues.html" id="nl-path">PATH fix</a>
+    <a href="/pgadmin-windows.html" id="nl-pgadmin">pgAdmin</a>
+    <a href="/postgresql-windows-faq.html" id="nl-faq">FAQ</a>
+  </div>
+  <a href="/download-windows.html" class="nav-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+</div></div></nav>
+<div class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="/index.html">home</a> <span>/</span> <span>pg-dump-restore-windows</span></nav>
+  <span class="page-tag">Backup guide</span>
+  <h1>pg_dump &amp; pg_restore on Windows &mdash; <span>backup &amp; restore guide</span></h1>
+  <p class="page-lead">Back up and restore PostgreSQL databases on Windows with pg_dump and pg_restore. Covers plain SQL and custom format dumps, parallel restore, scheduled backups with Task Scheduler.</p>
+  
+</div></div>
+<div class="wrap"><div class="content-layout">
+  <main><div class="callout callout-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>pg_dump and pg_restore are in the PostgreSQL bin directory. Make sure it is on your PATH, or use the full path: <code>C:\Program Files\PostgreSQL\18\bin\pg_dump.exe</code></span></div>
+<div class="section" aria-labelledby="dump-h2"><span class="section-label">pg_dump</span><h2 id="dump-h2">Back up a database with pg_dump</h2>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe</span></div><div class="term-body"><div><span class="t-cm"># Dump one database to a SQL file:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">pg_dump -U postgres -d mydb -f C:\backup\mydb.sql</span></div><div></div><div><span class="t-cm"># Compressed custom format (recommended for large DBs):</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">pg_dump -U postgres -d mydb -F c -f C:\backup\mydb.dump</span></div><div></div><div><span class="t-cm"># Dump all databases at once:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">pg_dumpall -U postgres -f C:\backup\all_databases.sql</span></div><div></div><div><span class="t-cm"># Dump only schema (no data):</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">pg_dump -U postgres -d mydb --schema-only -f C:\backup\schema.sql</span></div></div></div>
+</div>
+<div class="section" aria-labelledby="formats-h2"><span class="section-label">Dump formats</span><h2 id="formats-h2">Choosing the right backup format</h2>
+<div class="tbl-wrap"><table><thead><tr><th>Format</th><th>Flag</th><th>Size</th><th>Best for</th></tr></thead><tbody>
+<tr><td><strong>Plain SQL</strong></td><td>(default)</td><td>Largest</td><td>Human-readable, easy to inspect</td></tr>
+<tr><td><strong>Custom</strong></td><td><code>-F c</code></td><td>Compressed</td><td>Recommended &mdash; supports parallel restore</td></tr>
+<tr><td><strong>Directory</strong></td><td><code>-F d</code></td><td>Compressed</td><td>Parallel dump of large databases</td></tr>
+<tr><td><strong>Tar</strong></td><td><code>-F t</code></td><td>Medium</td><td>Portable archive format</td></tr>
+</tbody></table></div>
+<div class="callout callout-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Use the custom format (<code>-F c</code>) for regular backups. It is compressed, supports selective restore, and allows parallel restore with <code>-j</code> flag.</span></div>
+</div>
+<div class="section" aria-labelledby="restore-h2"><span class="section-label">pg_restore</span><h2 id="restore-h2">Restore a database with pg_restore</h2>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe</span></div><div class="term-body"><div><span class="t-cm"># Restore custom format dump:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">pg_restore -U postgres -d mydb -F c C:\backup\mydb.dump</span></div><div></div><div><span class="t-cm"># Restore to a new database (create it first):</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">psql -U postgres -c "CREATE DATABASE mydb_restored;"</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">pg_restore -U postgres -d mydb_restored C:\backup\mydb.dump</span></div><div></div><div><span class="t-cm"># Parallel restore (faster for large DBs):</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">pg_restore -U postgres -d mydb -j 4 C:\backup\mydb.dump</span></div><div></div><div><span class="t-cm"># Restore plain SQL dump:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">psql -U postgres -d mydb -f C:\backup\mydb.sql</span></div></div></div>
+</div>
+<div class="section" aria-labelledby="schedule-h2"><span class="section-label">Scheduled backups</span><h2 id="schedule-h2">Automate backups with Windows Task Scheduler</h2>
+<p>Create a batch script and schedule it to run nightly:</p>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">backup.bat</span></div><div class="term-body"><div><span class="t-cm">@echo off</span></div><div><span class="t-v">set PGPASSWORD=your_password</span></div><div><span class="t-v">set DATE=%date:~-4%%date:~3,2%%date:~0,2%</span></div><div><span class="t-v">"C:\Program Files\PostgreSQL\18\bin\pg_dump.exe" -U postgres -d mydb -F c -f "C:\backup\mydb_%DATE%.dump"</span></div><div><span class="t-cm">REM Delete backups older than 30 days:</span></div><div><span class="t-v">forfiles /p "C:\backup" /s /m *.dump /d -30 /c "cmd /c del @path"</span></div></div></div>
+<p>Schedule it: Task Scheduler &rarr; Create Basic Task &rarr; Daily &rarr; Action: Start a Program &rarr; point to your <code>backup.bat</code>.</p>
+</div>
+<div class="section" aria-labelledby="faq-h2"><span class="section-label">FAQ</span><h2 id="faq-h2">Backup and restore questions</h2><div class="faq">
+<div class="faq-item"><details><summary>pg_dump vs pg_dumpall &mdash; what is the difference?</summary><div class="faq-ans"><code>pg_dump</code> backs up a single database. <code>pg_dumpall</code> backs up all databases plus global objects like roles and tablespaces. For a full server backup, use <code>pg_dumpall</code>. For individual database backup and restore, use <code>pg_dump</code>.</div></details></div>
+<div class="faq-item"><details><summary>How do I avoid entering a password every time?</summary><div class="faq-ans">Create a <code>pgpass.conf</code> file in <code>%APPDATA%\postgresql\pgpass.conf</code> with the format: <code>hostname:port:database:username:password</code>. Set it to read-only. PostgreSQL reads it automatically.</div></details></div>
+<div class="faq-item"><details><summary>Restore fails with "already exists" errors</summary><div class="faq-ans">Add <code>--clean</code> to pg_restore to drop existing objects before recreating them: <code>pg_restore -U postgres -d mydb --clean C:\backup\mydb.dump</code>. Or restore to a fresh empty database to avoid conflicts.</div></details></div>
+<div class="faq-item"><details><summary>How large will my backup file be?</summary><div class="faq-ans">Custom format dumps are typically 5-10x smaller than the actual database size due to compression. A 10 GB database usually produces a 1-3 GB dump file. Plain SQL dumps are roughly the same size as the data.</div></details></div>
+</div></div>
+<div class="cta-banner"><div><h2>Need to upgrade PostgreSQL?</h2><p>Use your backup to safely migrate to a new version.</p></div><a href="/migrate-from-older-versions.html" class="btn-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Upgrade guide</a></div>
+<div style="margin-bottom:32px"><span class="section-label">Related guides</span><div class="rel-grid"><a href="/migrate-from-older-versions.html" class="rel-card"><div class="rel-title">Upgrade guide &rarr;</div><div class="rel-sub">use backup to migrate</div></a><a href="/postgresql-config-windows.html" class="rel-card"><div class="rel-title">postgresql.conf &rarr;</div><div class="rel-sub">configure backup paths</div></a><a href="/psql-commands-windows.html" class="rel-card"><div class="rel-title">psql commands &rarr;</div><div class="rel-sub">run queries</div></a></div></div></main>
+  <aside class="content-sidebar"><div class="sb-card"><div class="version-badge-label">Latest stable</div><div class="version-badge-val">18.3</div><div class="version-badge-sub">Released May 2026</div></div><div class="sb-card"><div class="sb-card-title">Install & setup</div><ul class="sb-links"><li><a href="/download-windows.html">Download PostgreSQL</a></li><li><a href="/offline-installer.html">Offline installer</a></li><li><a href="/configure-windows-service.html">Windows service</a></li><li><a href="/fix-path-issues.html">Fix PATH / psql</a></li><li><a href="/pgadmin-windows.html">pgAdmin 4</a></li><li><a href="/install-postgresql-windows-server.html">Windows Server</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Configuration</div><ul class="sb-links"><li><a href="/postgresql-config-windows.html">postgresql.conf</a></li><li><a href="/postgresql-port-5432.html">Port 5432</a></li><li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li><li><a href="/postgresql-password-windows.html">Reset password</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Tools & help</div><ul class="sb-links"><li><a href="/psql-commands-windows.html">psql commands</a></li><li><a href="/pg-dump-restore-windows.html" class="cur">Backup & restore</a></li><li><a href="/postgresql-python-windows.html">Python / psycopg2</a></li><li><a href="/odbc-driver-x64-x86.html">ODBC driver</a></li><li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li><li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li><li><a href="/postgresql-windows-faq.html">FAQ</a></li></ul></div></aside>
+</div></div>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><div class="footer-logo-mark">Pg</div><span class="footer-logo-name">PostgreSQL for Windows</span></div>
+      <p class="footer-tagline">Unofficial Windows guide for PostgreSQL &mdash; download, install, configure, troubleshoot.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Install &amp; setup</div>
+      <ul class="footer-links">
+        <li><a href="/download-windows.html">Download PostgreSQL</a></li>
+        <li><a href="/offline-installer.html">Offline installer</a></li>
+        <li><a href="/configure-windows-service.html">Windows service</a></li>
+        <li><a href="/fix-path-issues.html">Fix PATH / psql</a></li>
+        <li><a href="/pgadmin-windows.html">pgAdmin 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Configuration</div>
+      <ul class="footer-links">
+        <li><a href="/postgresql-config-windows.html">postgresql.conf</a></li>
+        <li><a href="/postgresql-port-5432.html">Port 5432</a></li>
+        <li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li>
+        <li><a href="/postgresql-password-windows.html">Reset password</a></li>
+        <li><a href="/install-postgresql-windows-server.html">Windows Server</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tools &amp; help</div>
+      <ul class="footer-links">
+        <li><a href="/psql-commands-windows.html">psql commands</a></li>
+        <li><a href="/pg-dump-restore-windows.html">Backup &amp; restore</a></li>
+        <li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li>
+        <li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li>
+        <li><a href="/postgresql-windows-faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Not affiliated with the PostgreSQL Global Development Group. Unofficial community guide.</p>
+    <p><strong>Affiliate disclosure:</strong> Download links may be partner links.</p>
+  </div>
+</div></footer>
+<div class="cookie-bar" id="cookieBar" style="display:none">
+  <p>We use Google Analytics for anonymous traffic data. <a href="/privacy.html">Privacy policy</a></p>
+  <div class="cookie-btns"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div>
+</div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+gtag('js',new Date());gtag('config','G-MHLW57MR8Q',{anonymize_ip:true,send_page_view:false});
+function grantGA(){gtag('consent','update',{analytics_storage:'granted'});gtag('event','page_view',{page_location:location.href,page_title:document.title})}
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.getElementById('cookieBar');
+  var c=localStorage.getItem('pg_consent');
+  if(!c){bar.style.display='flex'}else if(c==='1'){grantGA()}
+  document.getElementById('cookieAccept').addEventListener('click',function(){localStorage.setItem('pg_consent','1');grantGA();bar.style.display='none'});
+  document.getElementById('cookieDecline').addEventListener('click',function(){localStorage.setItem('pg_consent','0');bar.style.display='none'});
+});
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Back Up PostgreSQL on Windows with pg_dump","description":"How to use pg_dump and pg_restore for PostgreSQL backup and restore on Windows.","step":[{"@type":"HowToStep","position":1,"name":"Dump database","text":"pg_dump -U postgres -d mydb -F c -f backup.dump"},{"@type":"HowToStep","position":2,"name":"Create target database","text":"psql -U postgres -c CREATE DATABASE mydb_restored"},{"@type":"HowToStep","position":3,"name":"Restore","text":"pg_restore -U postgres -d mydb_restored backup.dump"}]}</script>
+<script>var el=document.getElementById("nl-home");if(el)el.classList.add("active");</script>
+</body></html>

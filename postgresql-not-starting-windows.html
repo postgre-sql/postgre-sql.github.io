@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PostgreSQL Service Not Starting on Windows — Diagnose and Fix</title>
+  <meta name="description" content="Fix PostgreSQL not starting on Windows 10 and 11. Port conflict, data directory permissions, stale lock file, antivirus blocking and data corruption solutions.">
+  <link rel="canonical" href="https://postgre-sql.github.io/postgresql-not-starting-windows.html">
+  <meta name="last-modified" content="2026-06-08">
+  <meta property="og:title" content="PostgreSQL Service Not Starting on Windows — Diagnose and Fix">
+  <meta property="og:description" content="Fix PostgreSQL not starting on Windows 10 and 11. Port conflict, data directory permissions, stale lock file, antivirus blocking and data corruption solutions.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://postgre-sql.github.io/postgresql-not-starting-windows.html">
+  <meta property="og:image" content="https://postgre-sql.github.io/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav class="site-nav"><div class="wrap"><div class="nav-inner">
+  <a href="/index.html" class="nav-logo"><div class="nav-logo-mark">Pg</div><span class="nav-logo-name">PostgreSQL</span><span class="nav-logo-sub">for Windows</span></a>
+  <div class="nav-links">
+    <a href="/index.html" id="nl-home">Home</a>
+    <a href="/download-windows.html" id="nl-dl">Download</a>
+    <a href="/offline-installer.html" id="nl-off">Offline</a>
+    <a href="/configure-windows-service.html" id="nl-svc">Service</a>
+    <a href="/fix-path-issues.html" id="nl-path">PATH fix</a>
+    <a href="/pgadmin-windows.html" id="nl-pgadmin">pgAdmin</a>
+    <a href="/postgresql-windows-faq.html" id="nl-faq">FAQ</a>
+  </div>
+  <a href="/download-windows.html" class="nav-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+</div></div></nav>
+<div class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="/index.html">home</a> <span>/</span> <span>postgresql-not-starting-windows</span></nav>
+  <span class="page-tag">Troubleshooting</span>
+  <h1>PostgreSQL service not starting on Windows &mdash; <span>diagnose &amp; fix</span></h1>
+  <p class="page-lead">PostgreSQL fails to start on Windows for a few common reasons: port conflict, permissions, stale lock file or antivirus interference. This guide covers all of them with exact diagnostic commands.</p>
+  
+</div></div>
+<div class="wrap"><div class="content-layout">
+  <main><div class="callout callout-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Start with the quick diagnostics below. Most PostgreSQL startup failures on Windows fall into three categories: port conflict, data directory permissions, or corrupted cluster.</span></div>
+<div class="section" aria-labelledby="diag-h2"><span class="section-label">Quick diagnostics</span><h2 id="diag-h2">First steps to diagnose the problem</h2>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe</span></div><div class="term-body"><div><span class="t-cm"># 1. Check service status:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">sc query postgresql-x64-18</span></div><div><span class="t-v">STATE : 1  STOPPED</span></div><div></div><div><span class="t-cm"># 2. Try to start and capture error:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">net start postgresql-x64-18</span></div><div><span class="t-err">System error 1053: The service did not respond to the start or control request</span></div><div></div><div><span class="t-cm"># 3. Check Windows Event Viewer for details:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">eventvwr.msc</span></div><div><span class="t-cm"># Windows Logs > Application > filter by Source: postgresql</span></div></div></div>
+</div>
+<div class="section" aria-labelledby="causes-h2"><span class="section-label">Common causes</span><h2 id="causes-h2">Most common reasons PostgreSQL fails to start</h2>
+<div class="faq">
+<div class="faq-item"><details open><summary>Port 5432 already in use</summary><div class="faq-ans">
+<p>Another process (possibly another PostgreSQL instance) is using port 5432. Find and stop it:</p>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe</span></div><div class="term-body"><div><span class="t-p">C:\&gt;</span> <span class="t-c">netstat -ano | findstr :5432</span></div><div><span class="t-v">TCP  0.0.0.0:5432  0.0.0.0:0  LISTENING  4821</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">tasklist | findstr 4821</span></div><div><span class="t-v">postgres.exe  4821  ...</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">taskkill /PID 4821 /F</span></div></div></div>
+</div></details></div>
+<div class="faq-item"><details><summary>Data directory permissions problem</summary><div class="faq-ans">
+<p>The service account (NetworkService) must have full control of the data directory. Check and fix permissions:</p>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">PowerShell &mdash; Administrator</span></div><div class="term-body"><div><span class="t-p">PS&gt;</span> <span class="t-c">icacls "C:\Program Files\PostgreSQL\18\data"</span></div><div><span class="t-cm"># Should show NetworkService with (F) full control</span></div><div></div><div><span class="t-cm"># Fix permissions if missing:</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">icacls "C:\Program Files\PostgreSQL\18\data" /grant "NetworkService:(OI)(CI)F"</span></div></div></div>
+</div></details></div>
+<div class="faq-item"><details><summary>PostgreSQL log shows "could not create lock file"</summary><div class="faq-ans">
+<p>A stale <code>postmaster.pid</code> lock file from a previous crash is preventing startup. Delete it carefully:</p>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">PowerShell &mdash; Administrator</span></div><div class="term-body"><div><span class="t-cm"># Only do this when PostgreSQL is definitely stopped:</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">Remove-Item "C:\Program Files\PostgreSQL\18\data\postmaster.pid"</span></div><div></div><div><span class="t-cm"># Then start the service:</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">Start-Service postgresql-x64-18</span></div></div></div>
+<div class="callout callout-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Only delete postmaster.pid when you are certain PostgreSQL is not running. Deleting it while the server is running can corrupt data.</span></div>
+</div></details></div>
+<div class="faq-item"><details><summary>Windows Defender or antivirus blocking PostgreSQL</summary><div class="faq-ans"><p>Windows Defender may block PostgreSQL from binding to its port or accessing data files. Add exclusions for the PostgreSQL binary and data directories: Windows Security &rarr; Virus &amp; threat protection &rarr; Exclusions &rarr; Add an exclusion &rarr; Folder &rarr; select <code>C:\Program Files\PostgreSQL</code>.</p></div></details></div>
+<div class="faq-item"><details><summary>Error: "invalid page in block" or data corruption</summary><div class="faq-ans"><p>This indicates possible data corruption, often from an unclean shutdown (power loss, forced kill). First try: <code>pg_resetwal</code> to reset the write-ahead log (risky &mdash; may lose recent transactions). Better: restore from your most recent backup. This is why regular backups with <code>pg_dump</code> are essential.</p></div></details></div>
+</div></div>
+<div class="section" aria-labelledby="logs-h2"><span class="section-label">Read the logs</span><h2 id="logs-h2">Check PostgreSQL logs for the actual error</h2>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">PowerShell</span></div><div class="term-body"><div><span class="t-cm"># Find and read latest log file:</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">Get-ChildItem "C:\Program Files\PostgreSQL\18\data\log" | Sort LastWriteTime -Desc | Select -First 1</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">Get-Content "C:\Program Files\PostgreSQL\18\data\log\postgresql-2026-06-08.log" -Tail 30</span></div><div><span class="t-cm"># Look for FATAL or ERROR lines</span></div></div></div>
+</div>
+<div class="cta-banner"><div><h2>Related: Port 5432 conflict?</h2><p>Find and resolve port conflicts step by step.</p></div><a href="/postgresql-port-5432.html" class="btn-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Port 5432 guide</a></div>
+<div style="margin-bottom:32px"><span class="section-label">Related guides</span><div class="rel-grid"><a href="/postgresql-port-5432.html" class="rel-card"><div class="rel-title">Port 5432 &rarr;</div><div class="rel-sub">port conflict fix</div></a><a href="/configure-windows-service.html" class="rel-card"><div class="rel-title">Windows service &rarr;</div><div class="rel-sub">service management</div></a><a href="/postgresql-config-windows.html" class="rel-card"><div class="rel-title">postgresql.conf &rarr;</div><div class="rel-sub">config file guide</div></a></div></div></main>
+  <aside class="content-sidebar"><div class="sb-card"><div class="version-badge-label">Latest stable</div><div class="version-badge-val">18.3</div><div class="version-badge-sub">Released May 2026</div></div><div class="sb-card"><div class="sb-card-title">Install & setup</div><ul class="sb-links"><li><a href="/download-windows.html">Download PostgreSQL</a></li><li><a href="/offline-installer.html">Offline installer</a></li><li><a href="/configure-windows-service.html">Windows service</a></li><li><a href="/fix-path-issues.html">Fix PATH / psql</a></li><li><a href="/pgadmin-windows.html">pgAdmin 4</a></li><li><a href="/install-postgresql-windows-server.html">Windows Server</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Configuration</div><ul class="sb-links"><li><a href="/postgresql-config-windows.html">postgresql.conf</a></li><li><a href="/postgresql-port-5432.html">Port 5432</a></li><li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li><li><a href="/postgresql-password-windows.html">Reset password</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Tools & help</div><ul class="sb-links"><li><a href="/psql-commands-windows.html">psql commands</a></li><li><a href="/pg-dump-restore-windows.html">Backup & restore</a></li><li><a href="/postgresql-python-windows.html">Python / psycopg2</a></li><li><a href="/odbc-driver-x64-x86.html">ODBC driver</a></li><li><a href="/postgresql-not-starting-windows.html" class="cur">Service not starting</a></li><li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li><li><a href="/postgresql-windows-faq.html">FAQ</a></li></ul></div></aside>
+</div></div>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><div class="footer-logo-mark">Pg</div><span class="footer-logo-name">PostgreSQL for Windows</span></div>
+      <p class="footer-tagline">Unofficial Windows guide for PostgreSQL &mdash; download, install, configure, troubleshoot.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Install &amp; setup</div>
+      <ul class="footer-links">
+        <li><a href="/download-windows.html">Download PostgreSQL</a></li>
+        <li><a href="/offline-installer.html">Offline installer</a></li>
+        <li><a href="/configure-windows-service.html">Windows service</a></li>
+        <li><a href="/fix-path-issues.html">Fix PATH / psql</a></li>
+        <li><a href="/pgadmin-windows.html">pgAdmin 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Configuration</div>
+      <ul class="footer-links">
+        <li><a href="/postgresql-config-windows.html">postgresql.conf</a></li>
+        <li><a href="/postgresql-port-5432.html">Port 5432</a></li>
+        <li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li>
+        <li><a href="/postgresql-password-windows.html">Reset password</a></li>
+        <li><a href="/install-postgresql-windows-server.html">Windows Server</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tools &amp; help</div>
+      <ul class="footer-links">
+        <li><a href="/psql-commands-windows.html">psql commands</a></li>
+        <li><a href="/pg-dump-restore-windows.html">Backup &amp; restore</a></li>
+        <li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li>
+        <li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li>
+        <li><a href="/postgresql-windows-faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Not affiliated with the PostgreSQL Global Development Group. Unofficial community guide.</p>
+    <p><strong>Affiliate disclosure:</strong> Download links may be partner links.</p>
+  </div>
+</div></footer>
+<div class="cookie-bar" id="cookieBar" style="display:none">
+  <p>We use Google Analytics for anonymous traffic data. <a href="/privacy.html">Privacy policy</a></p>
+  <div class="cookie-btns"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div>
+</div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+gtag('js',new Date());gtag('config','G-MHLW57MR8Q',{anonymize_ip:true,send_page_view:false});
+function grantGA(){gtag('consent','update',{analytics_storage:'granted'});gtag('event','page_view',{page_location:location.href,page_title:document.title})}
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.getElementById('cookieBar');
+  var c=localStorage.getItem('pg_consent');
+  if(!c){bar.style.display='flex'}else if(c==='1'){grantGA()}
+  document.getElementById('cookieAccept').addEventListener('click',function(){localStorage.setItem('pg_consent','1');grantGA();bar.style.display='none'});
+  document.getElementById('cookieDecline').addEventListener('click',function(){localStorage.setItem('pg_consent','0');bar.style.display='none'});
+});
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why is PostgreSQL not starting on Windows?","acceptedAnswer":{"@type":"Answer","text":"Common causes: port 5432 already in use, data directory permissions, stale postmaster.pid file, or antivirus blocking. Check Windows Event Viewer and the PostgreSQL log files for the specific error."}},{"@type":"Question","name":"How to fix port 5432 already in use?","acceptedAnswer":{"@type":"Answer","text":"Run netstat -ano | findstr :5432 to find the PID, then tasklist to identify the process, then stop it."}}]}</script>
+<script>var el=document.getElementById("nl-home");if(el)el.classList.add("active");</script>
+</body></html>

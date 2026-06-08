@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PostgreSQL Port 5432 on Windows — Check, Change and Fix Conflicts</title>
+  <meta name="description" content="How to check PostgreSQL port 5432 on Windows, fix port already in use errors, change the default port in postgresql.conf, and update Windows Firewall rules.">
+  <link rel="canonical" href="https://postgre-sql.github.io/postgresql-port-5432.html">
+  <meta name="last-modified" content="2026-06-08">
+  <meta property="og:title" content="PostgreSQL Port 5432 on Windows — Check, Change and Fix Conflicts">
+  <meta property="og:description" content="How to check PostgreSQL port 5432 on Windows, fix port already in use errors, change the default port in postgresql.conf, and update Windows Firewall rules.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://postgre-sql.github.io/postgresql-port-5432.html">
+  <meta property="og:image" content="https://postgre-sql.github.io/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav class="site-nav"><div class="wrap"><div class="nav-inner">
+  <a href="/index.html" class="nav-logo"><div class="nav-logo-mark">Pg</div><span class="nav-logo-name">PostgreSQL</span><span class="nav-logo-sub">for Windows</span></a>
+  <div class="nav-links">
+    <a href="/index.html" id="nl-home">Home</a>
+    <a href="/download-windows.html" id="nl-dl">Download</a>
+    <a href="/offline-installer.html" id="nl-off">Offline</a>
+    <a href="/configure-windows-service.html" id="nl-svc">Service</a>
+    <a href="/fix-path-issues.html" id="nl-path">PATH fix</a>
+    <a href="/pgadmin-windows.html" id="nl-pgadmin">pgAdmin</a>
+    <a href="/postgresql-windows-faq.html" id="nl-faq">FAQ</a>
+  </div>
+  <a href="/download-windows.html" class="nav-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+</div></div></nav>
+<div class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="/index.html">home</a> <span>/</span> <span>postgresql-port-5432</span></nav>
+  <span class="page-tag">Port guide</span>
+  <h1>PostgreSQL port 5432 on Windows &mdash; <span>check, change &amp; fix conflicts</span></h1>
+  <p class="page-lead">PostgreSQL listens on port 5432 by default. This guide covers verifying the port is open, fixing port conflicts, changing the port in postgresql.conf and updating firewall rules.</p>
+  
+</div></div>
+<div class="wrap"><div class="content-layout">
+  <main><div class="section" aria-labelledby="default-h2"><span class="section-label">Default port</span><h2 id="default-h2">PostgreSQL uses port 5432 by default</h2>
+<p>PostgreSQL listens on TCP port 5432 by default. This is the registered IANA port for PostgreSQL. All clients &mdash; psql, pgAdmin, ODBC drivers, application frameworks &mdash; connect to this port by default unless configured otherwise.</p>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe</span></div><div class="term-body"><div><span class="t-cm"># Verify PostgreSQL is listening on port 5432:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">netstat -ano | findstr 5432</span></div><div><span class="t-v">TCP  0.0.0.0:5432  0.0.0.0:0  LISTENING  3412</span></div><div></div><div><span class="t-cm"># Check which process owns port 5432:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">tasklist | findstr 3412</span></div><div><span class="t-v">postgres.exe  3412  Services  0  25,324 K</span></div></div></div>
+</div>
+<div class="section" aria-labelledby="conflict-h2"><span class="section-label">Port conflict fix</span><h2 id="conflict-h2">Fix "port 5432 already in use"</h2>
+<ul class="steps">
+<li class="step"><div class="step-n">1</div><div><h3>Find the process using port 5432</h3>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe</span></div><div class="term-body"><div><span class="t-p">C:\&gt;</span> <span class="t-c">netstat -ano | findstr :5432</span></div><div><span class="t-v">TCP  0.0.0.0:5432  0.0.0.0:0  LISTENING  8724</span></div><div><span class="t-cm"># PID is 8724</span></div><div></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">tasklist | findstr 8724</span></div><div><span class="t-v">postgres.exe  8724  ...</span></div></div></div>
+</div></li>
+<li class="step"><div class="step-n">2</div><div><h3>If it is another PostgreSQL instance</h3><p>You may have two PostgreSQL versions installed. Stop the other instance via services.msc or <code>net stop postgresql-x64-16</code> (for version 16). Then start your intended version.</p></div></li>
+<li class="step"><div class="step-n">3</div><div><h3>If it is a different application</h3><p>Either stop the conflicting application, or change the PostgreSQL port as described below.</p></div></li>
+</ul>
+</div>
+<div class="section" aria-labelledby="change-h2"><span class="section-label">Change port</span><h2 id="change-h2">How to change PostgreSQL port on Windows</h2>
+<ul class="steps">
+<li class="step"><div class="step-n">1</div><div><h3>Edit postgresql.conf</h3>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">PowerShell &mdash; Administrator</span></div><div class="term-body"><div><span class="t-p">PS&gt;</span> <span class="t-c">notepad "C:\Program Files\PostgreSQL\18\data\postgresql.conf"</span></div><div><span class="t-cm"># Find the line: #port = 5432</span></div><div><span class="t-cm"># Uncomment and change to your desired port:</span></div><div><span class="t-v">port = 5433</span></div></div></div>
+</div></li>
+<li class="step"><div class="step-n">2</div><div><h3>Restart the service</h3>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe &mdash; Administrator</span></div><div class="term-body"><div><span class="t-p">C:\&gt;</span> <span class="t-c">net stop postgresql-x64-18 && net start postgresql-x64-18</span></div></div></div>
+</div></li>
+<li class="step"><div class="step-n">3</div><div><h3>Verify new port</h3>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe</span></div><div class="term-body"><div><span class="t-p">C:\&gt;</span> <span class="t-c">netstat -ano | findstr 5433</span></div><div><span class="t-v">TCP  0.0.0.0:5433  0.0.0.0:0  LISTENING</span></div><div></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">psql -U postgres -p 5433 -c "SELECT current_setting('port');"</span></div><div><span class="t-v"> current_setting</span></div><div><span class="t-ok"> 5433</span></div></div></div>
+</div></li>
+<li class="step"><div class="step-n">4</div><div><h3>Update Windows Firewall rule</h3><p>If you have a firewall rule for port 5432, add a new rule for the new port or update the existing one. See <a href="/postgresql-allow-remote-connections.html">Remote connections guide</a>.</p></div></li>
+</ul>
+</div>
+<div class="section" aria-labelledby="faq-h2"><span class="section-label">FAQ</span><h2 id="faq-h2">Port 5432 questions</h2><div class="faq">
+<div class="faq-item"><details><summary>Can two PostgreSQL versions use the same port?</summary><div class="faq-ans">No. Only one process can listen on a given port at a time. When you install a second PostgreSQL version, the installer assigns it a different port (e.g. 5433). You can configure them to use any ports you choose as long as they do not conflict.</div></details></div>
+<div class="faq-item"><details><summary>Do I need to open port 5432 in Windows Firewall?</summary><div class="faq-ans">Only if you want connections from other machines. For local connections only (from the same PC), no firewall rule is needed. To allow remote connections, add an inbound rule for TCP port 5432. See <a href="/postgresql-allow-remote-connections.html">Remote connections guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>psql connects to the wrong PostgreSQL version</summary><div class="faq-ans">If you have multiple versions installed, always specify the port explicitly: <code>psql -U postgres -p 5433</code> for the instance on port 5433. Or make sure the PATH points to the correct version bin directory first.</div></details></div>
+</div></div>
+<div class="cta-banner"><div><h2>Need remote access?</h2><p>Configure firewall and pg_hba.conf for connections from other machines.</p></div><a href="/postgresql-allow-remote-connections.html" class="btn-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Remote connections</a></div>
+<div style="margin-bottom:32px"><span class="section-label">Related guides</span><div class="rel-grid"><a href="/postgresql-allow-remote-connections.html" class="rel-card"><div class="rel-title">Remote connections &rarr;</div><div class="rel-sub">firewall + pg_hba.conf</div></a><a href="/postgresql-config-windows.html" class="rel-card"><div class="rel-title">postgresql.conf &rarr;</div><div class="rel-sub">full config guide</div></a><a href="/postgresql-not-starting-windows.html" class="rel-card"><div class="rel-title">Service not starting &rarr;</div><div class="rel-sub">port conflict errors</div></a></div></div></main>
+  <aside class="content-sidebar"><div class="sb-card"><div class="version-badge-label">Latest stable</div><div class="version-badge-val">18.3</div><div class="version-badge-sub">Released May 2026</div></div><div class="sb-card"><div class="sb-card-title">Install & setup</div><ul class="sb-links"><li><a href="/download-windows.html">Download PostgreSQL</a></li><li><a href="/offline-installer.html">Offline installer</a></li><li><a href="/configure-windows-service.html">Windows service</a></li><li><a href="/fix-path-issues.html">Fix PATH / psql</a></li><li><a href="/pgadmin-windows.html">pgAdmin 4</a></li><li><a href="/install-postgresql-windows-server.html">Windows Server</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Configuration</div><ul class="sb-links"><li><a href="/postgresql-config-windows.html">postgresql.conf</a></li><li><a href="/postgresql-port-5432.html" class="cur">Port 5432</a></li><li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li><li><a href="/postgresql-password-windows.html">Reset password</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Tools & help</div><ul class="sb-links"><li><a href="/psql-commands-windows.html">psql commands</a></li><li><a href="/pg-dump-restore-windows.html">Backup & restore</a></li><li><a href="/postgresql-python-windows.html">Python / psycopg2</a></li><li><a href="/odbc-driver-x64-x86.html">ODBC driver</a></li><li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li><li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li><li><a href="/postgresql-windows-faq.html">FAQ</a></li></ul></div></aside>
+</div></div>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><div class="footer-logo-mark">Pg</div><span class="footer-logo-name">PostgreSQL for Windows</span></div>
+      <p class="footer-tagline">Unofficial Windows guide for PostgreSQL &mdash; download, install, configure, troubleshoot.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Install &amp; setup</div>
+      <ul class="footer-links">
+        <li><a href="/download-windows.html">Download PostgreSQL</a></li>
+        <li><a href="/offline-installer.html">Offline installer</a></li>
+        <li><a href="/configure-windows-service.html">Windows service</a></li>
+        <li><a href="/fix-path-issues.html">Fix PATH / psql</a></li>
+        <li><a href="/pgadmin-windows.html">pgAdmin 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Configuration</div>
+      <ul class="footer-links">
+        <li><a href="/postgresql-config-windows.html">postgresql.conf</a></li>
+        <li><a href="/postgresql-port-5432.html">Port 5432</a></li>
+        <li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li>
+        <li><a href="/postgresql-password-windows.html">Reset password</a></li>
+        <li><a href="/install-postgresql-windows-server.html">Windows Server</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tools &amp; help</div>
+      <ul class="footer-links">
+        <li><a href="/psql-commands-windows.html">psql commands</a></li>
+        <li><a href="/pg-dump-restore-windows.html">Backup &amp; restore</a></li>
+        <li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li>
+        <li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li>
+        <li><a href="/postgresql-windows-faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Not affiliated with the PostgreSQL Global Development Group. Unofficial community guide.</p>
+    <p><strong>Affiliate disclosure:</strong> Download links may be partner links.</p>
+  </div>
+</div></footer>
+<div class="cookie-bar" id="cookieBar" style="display:none">
+  <p>We use Google Analytics for anonymous traffic data. <a href="/privacy.html">Privacy policy</a></p>
+  <div class="cookie-btns"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div>
+</div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+gtag('js',new Date());gtag('config','G-MHLW57MR8Q',{anonymize_ip:true,send_page_view:false});
+function grantGA(){gtag('consent','update',{analytics_storage:'granted'});gtag('event','page_view',{page_location:location.href,page_title:document.title})}
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.getElementById('cookieBar');
+  var c=localStorage.getItem('pg_consent');
+  if(!c){bar.style.display='flex'}else if(c==='1'){grantGA()}
+  document.getElementById('cookieAccept').addEventListener('click',function(){localStorage.setItem('pg_consent','1');grantGA();bar.style.display='none'});
+  document.getElementById('cookieDecline').addEventListener('click',function(){localStorage.setItem('pg_consent','0');bar.style.display='none'});
+});
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Change PostgreSQL Port on Windows","description":"How to change the PostgreSQL default port 5432 on Windows.","step":[{"@type":"HowToStep","position":1,"name":"Edit postgresql.conf","text":"Set port = 5433 in postgresql.conf"},{"@type":"HowToStep","position":2,"name":"Restart service","text":"net stop postgresql-x64-18 && net start postgresql-x64-18"},{"@type":"HowToStep","position":3,"name":"Verify","text":"netstat -ano | findstr 5433"}]}</script>
+<script>var el=document.getElementById("nl-home");if(el)el.classList.add("active");</script>
+</body></html>

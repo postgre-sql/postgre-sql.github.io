@@ -1,504 +1,146 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PostgreSQL for Windows — Download, Install, and Configure</title>
-  <meta name="description" content="Fast, safe guide to install PostgreSQL on Windows 10/11. Direct download, offline installer, ODBC drivers, service setup, PATH fix, and migration." />
-  <link rel="canonical" href="https://postgre-sql.github.io/" />
-  <meta name="last-modified" content="2026-05-01T13:06:51Z" />
-  <meta name="robots" content="index,follow" />
-  <meta name="theme-color" content="#336791" />
-  <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="PostgreSQL for Windows — Download, Install, and Configure" />
-  <meta property="og:description" content="Fast, safe guide to install PostgreSQL on Windows 10/11. Direct download, offline installer, ODBC drivers, service setup, PATH fix, and migration." />
-  <meta property="og:url" content="https://postgre-sql.github.io/" />
-  <meta property="og:site_name" content="PostgreSQL for Windows" />
-  <meta property="og:image" content="https://postgre-sql.github.io/og-image.png" />
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="PostgreSQL for Windows — Download, Install, and Configure" />
-  <meta name="twitter:description" content="Fast, safe guide to install PostgreSQL on Windows 10/11. Direct download, offline installer, ODBC drivers, service setup, PATH fix, and migration." />
-  <meta name="twitter:image" content="https://postgre-sql.github.io/og-image.png" />
-  <!-- Icons (to be added to root later) -->
-  <link rel="icon" href="https://postgre-sql.github.io/favicon.svg" type="image/svg+xml" />
-  <link rel="alternate icon" href="https://postgre-sql.github.io/favicon.ico" />
-  <link rel="apple-touch-icon" href="https://postgre-sql.github.io/apple-touch-icon.png" />
-
-  <style>
-    :root{
-      --bg: #F8FAFC;          /* background */
-      --panel: #FFFFFF;       /* panels */
-      --text: #0F172A;        /* primary text */
-      --muted: #334155;       /* secondary text */
-      --primary: #336791;     /* PostgreSQL blue */
-      --primary-600:#2b5a75;
-      --primary-700:#244a60;
-      --accent: #3E7BB6;
-      --success:#2F855A;
-      --warning:#B7791F;
-      --border:#E2E8F0;
-      --focus:#F59E0B;
-      --shadow: 0 2px 10px rgba(15,23,42,.08);
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0; color:var(--text); background:var(--bg);
-      font: 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    }
-    a{color:var(--primary)}
-    a:focus, button:focus, [role="button"]:focus{outline:3px solid var(--focus); outline-offset:2px}
-
-    header{
-      position:sticky; top:0; z-index:50; background:rgba(255,255,255,.9); backdrop-filter:saturate(180%) blur(8px);
-      border-bottom:1px solid var(--border);
-    }
-    .wrap{max-width:1100px; margin:0 auto; padding:0 16px}
-    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 0}
-    .brand{display:flex; align-items:center; gap:10px; color:var(--primary-700); text-decoration:none; font-weight:700}
-    .brand svg{width:28px;height:28px}
-    nav ul{list-style:none; margin:0; padding:0; display:flex; gap:14px; flex-wrap:wrap}
-    nav a{display:inline-flex; align-items:center; gap:6px; text-decoration:none; color:var(--muted); padding:8px 10px; border-radius:8px}
-    nav a:hover{background:#eef2f7; color:var(--primary-700)}
-
-    .hero{background:linear-gradient(180deg, #fff 0%, #f3f7fb 100%); border-bottom:1px solid var(--border)}
-    .hero .inner{display:grid; grid-template-columns:1.1fr .9fr; gap:24px; padding:34px 0}
-    .hero h1{font-size:clamp(26px,3.5vw,40px); line-height:1.15; margin:8px 0 10px}
-    .hero p.sub{color:var(--muted); margin:0 0 18px}
-
-    .btn{appearance:none; border:0; border-radius:10px; padding:12px 16px; display:inline-flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; text-decoration:none}
-    .btn-primary{background:var(--primary); color:#fff}
-    .btn-primary:hover{background:var(--primary-600)}
-    .btn-ghost{background:transparent; color:var(--primary-700); border:2px solid var(--primary-600)}
-    .btn-ghost:hover{background:#e8f0f9}
-    .cta-row{display:flex; gap:12px; flex-wrap:wrap}
-    .note{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:14px; margin-top:10px}
-
-    .card-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
-    .card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:var(--shadow)}
-    .card h3{margin:0 0 8px; font-size:18px}
-    .card p{margin:0; color:var(--muted)}
-
-    .section{padding:30px 0}
-    .section h2{margin:0 0 14px; font-size:22px}
-
-    .quick-answers .qa{background:#fff; border:1px solid var(--border); padding:14px; border-radius:12px}
-    .qa h4{margin:0 0 6px; font-size:16px}
-    .qa p{margin:0; color:var(--muted)}
-
-    .breadcrumbs{font-size:14px; color:var(--muted); padding:10px 0}
-    .breadcrumbs a{text-decoration:none; color:inherit}
-
-    .disclaimer{background:#fff; border:1px dashed var(--border); padding:14px; border-radius:12px; color:var(--muted)}
-
-    footer{margin-top:24px; border-top:1px solid var(--border); background:#fff}
-    .footer-inner{display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:18px 0}
-    .muted{color:var(--muted)}
-
-    .mobile-cta{position:fixed; bottom:12px; left:12px; right:12px; display:none; z-index:30}
-    .mobile-cta .inner{background:#10263a; border-radius:14px; padding:10px; display:flex; justify-content:space-between; align-items:center; gap:10px; color:#e6f1fa; box-shadow:0 8px 22px rgba(0,0,0,.25)}
-    .mobile-cta .inner .btn{padding:10px 14px}
-
-    /* Cookie banner */
-    .cookie-banner{position:fixed; z-index:60; inset:auto 12px 12px 12px; background:#fff; border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); display:none}
-    .cookie-content{padding:14px; display:grid; grid-template-columns:1fr auto; gap:12px; align-items:start}
-    .cookie-actions{display:flex; gap:8px; flex-wrap:wrap}
-    .cookie-banner .btn{padding:10px 12px}
-
-    /* Responsive */
-    @media (max-width: 900px){
-      .hero .inner{grid-template-columns:1fr}
-      .card-grid{grid-template-columns:1fr 1fr}
-      .footer-inner{grid-template-columns:1fr}
-    }
-    @media (max-width: 640px){
-      .card-grid{grid-template-columns:1fr}
-      .mobile-cta{display:block}
-    }
-  </style>
-
-  <!-- SVG Sprite -->
-  <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
-    <symbol id="icon-download" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 3a1 1 0 011 1v8.586l2.293-2.293a1 1 0 111.414 1.414l-4.001 4a1 1 0 01-1.412 0l-4.001-4a1 1 0 011.414-1.414L11 12.586V4a1 1 0 011-1z"/>
-      <path d="M4 15a1 1 0 011-1h2a1 1 0 010 2H6v3h12v-3h-1a1 1 0 110-2h2a1 1 0 011 1v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4z"/>
-    </symbol>
-    <symbol id="icon-external" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3a1 1 0 000 2h3.586l-8.293 8.293a1 1 0 001.414 1.414L19 6.414V10a1 1 0 002 0V4a1 1 0 00-1-1h-6z"/><path d="M5 6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5a1 1 0 10-2 0v5H5V8h5a1 1 0 100-2H5z"/></symbol>
-    <symbol id="icon-check" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 6.708a1 1 0 010 1.414l-9.192 9.192a1 1 0 01-1.414 0L3.715 11.55a1 1 0 111.414-1.414l5.1 5.1 8.485-8.485a1 1 0 011.571-.042z"/></symbol>
-    <symbol id="icon-info" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 6a1.25 1.25 0 110-2.5A1.25 1.25 0 0112 8zm1 9h-2v-6h2v6z"/></symbol>
-    <symbol id="icon-warning" viewBox="0 0 24 24" fill="currentColor"><path d="M12.882 2.773l9.02 15.625A2 2 0 0120.236 22H3.764a2 2 0 01-1.666-3.602l9.02-15.625a2 2 0 013.764 0zM11 9v5h2V9h-2zm1 8a1.25 1.25 0 100-2.5A1.25 1.25 0 0012 17z"/></symbol>
-    <symbol id="icon-close" viewBox="0 0 24 24" fill="currentColor"><path d="M6.225 4.811a1 1 0 011.414 0L12 9.172l4.361-4.361a1 1 0 111.414 1.414L13.414 10.586l4.361 4.361a1 1 0 01-1.414 1.414L12 12l-4.361 4.361a1 1 0 01-1.414-1.414l4.361-4.361-4.361-4.361a1 1 0 010-1.414z"/></symbol>
-  </svg>
-
-  <!-- GA4 base tag -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
-    // Consent default: denied until user accepts cookies
-    gtag('consent','default', { 'analytics_storage':'denied', 'ad_storage':'denied' });
-    gtag('js', new Date());
-    gtag('config', 'G-MHLW57MR8Q', { anonymize_ip: true });
-  </script>
-
-  <!-- Schema.org JSON-LD -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "name": "PostgreSQL for Windows",
-        "url": "https://postgre-sql.github.io/",
-        "inLanguage": "en",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "https://postgre-sql.github.io/?q={search_term_string}",
-          "query-input": "required name=search_term_string"
-        }
-      },
-      {
-        "@type": "Organization",
-        "name": "Unofficial PostgreSQL for Windows Guide",
-        "url": "https://postgre-sql.github.io/",
-        "logo": "https://postgre-sql.github.io/favicon.svg"
-      },
-      {
-        "@type": "SoftwareApplication",
-        "name": "PostgreSQL for Windows",
-        "operatingSystem": "Windows 11, Windows 10 (64-bit)",
-        "applicationCategory": "DatabaseApplication",
-        "softwareVersion": "18.3-3",
-        "downloadUrl": "https://get.enterprisedb.com/postgresql/postgresql-18.3-3-windows-x64.exe",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD",
-          "category": "free"
-        },
-        "publisher": {
-          "@type": "Organization",
-          "name": "Unofficial PostgreSQL for Windows Guide",
-          "url": "https://postgre-sql.github.io/"
-        }
-      },
-      {
-        "@type":"HowTo",
-        "name":"Install PostgreSQL on Windows (Quick Start)",
-        "totalTime":"PT5M",
-        "step": [
-          {"@type":"HowToStep","name":"Download the installer","text":"Get the verified 64-bit installer for Windows 10/11.",
-            "url":"https://postgre-sql.github.io/#download"},
-          {"@type":"HowToStep","name":"Run setup","text":"Launch the .exe, choose data directory, and set a strong postgres password.",
-            "url":"https://postgre-sql.github.io/#steps"},
-          {"@type":"HowToStep","name":"Finish and test","text":"Open Command Prompt and run psql --version. If not found, add PostgreSQL bin to PATH.",
-            "url":"https://postgre-sql.github.io/#verify"}
-        ]
-      },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "What is the easiest way to install PostgreSQL on Windows?",
-            "acceptedAnswer": {"@type":"Answer","text":"Use the verified 64-bit installer, choose a data directory, set a strong postgres password, and finish the wizard in minutes."}
-          },
-          {
-            "@type": "Question",
-            "name": "Can I install PostgreSQL offline on Windows?",
-            "acceptedAnswer": {"@type":"Answer","text":"Yes. Download the full installer first while online, then run it offline. Skip Stack Builder during the offline session."}
-          },
-          {
-            "@type": "Question",
-            "name": "x64 vs x86 ODBC driver — which one do I need?",
-            "acceptedAnswer": {"@type":"Answer","text":"Match the ODBC driver to your client application's architecture. Most modern apps on 64-bit Windows use the x64 driver."}
-          },
-          {
-            "@type": "Question",
-            "name": "How do I fix ‘psql is not recognized’ on Windows?",
-            "acceptedAnswer": {"@type":"Answer","text":"Add the PostgreSQL bin folder to your PATH and restart the terminal. Then run 'where psql' to verify."}
-          },
-          {
-            "@type": "Question",
-            "name": "Is this an official PostgreSQL site?",
-            "acceptedAnswer": {"@type":"Answer","text":"No. This is an unofficial guide. PostgreSQL is a registered trademark of the PostgreSQL Community Association of Canada."}
-          }
-        ]
-      },
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [{
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://postgre-sql.github.io/"
-        }]
-      }
-    ]
-  }
-  </script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PostgreSQL for Windows — Download, Install and Configure</title>
+  <meta name="description" content="Complete guide to download, install and configure PostgreSQL on Windows 10 and 11. Covers psql PATH fix, pgAdmin 4, Windows service, backups and more.">
+  <link rel="canonical" href="https://postgre-sql.github.io/">
+  <meta name="last-modified" content="2026-06-08">
+  <meta property="og:title" content="PostgreSQL for Windows — Download, Install and Configure">
+  <meta property="og:description" content="Complete guide to download, install and configure PostgreSQL on Windows 10 and 11. Covers psql PATH fix, pgAdmin 4, Windows service, backups and more.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://postgre-sql.github.io/">
+  <meta property="og:image" content="https://postgre-sql.github.io/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header>
-    <div class="wrap topbar">
-      <a class="brand" href="https://postgre-sql.github.io/" aria-label="PostgreSQL for Windows — home">
-        <svg aria-hidden="true"><use href="#icon-check"></use></svg>
-        <span>PostgreSQL for Windows</span>
-      </a>
-      <nav aria-label="Primary navigation">
-        <ul>
-          <li><a href="https://postgre-sql.github.io/download-windows.html"><svg width="16" height="16" aria-hidden="true"><use href="#icon-download"></use></svg> Download</a></li>
-          <li><a href="https://postgre-sql.github.io/offline-installer.html">Offline installer</a></li>
-          <li><a href="https://postgre-sql.github.io/odbc-driver-x64-x86.html">ODBC x64/x86</a></li>
-          <li><a href="https://postgre-sql.github.io/configure-windows-service.html">Service</a></li>
-          <li><a href="https://postgre-sql.github.io/fix-path-issues.html">PATH</a></li>
-          <li><a href="https://postgre-sql.github.io/migrate-from-older-versions.html">Migrate</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
-  <div class="wrap breadcrumbs" aria-label="Breadcrumb">
-    <a href="https://postgre-sql.github.io/">Home</a>
+<nav class="site-nav"><div class="wrap"><div class="nav-inner">
+  <a href="/index.html" class="nav-logo"><div class="nav-logo-mark">Pg</div><span class="nav-logo-name">PostgreSQL</span><span class="nav-logo-sub">for Windows</span></a>
+  <div class="nav-links">
+    <a href="/index.html" id="nl-home">Home</a>
+    <a href="/download-windows.html" id="nl-dl">Download</a>
+    <a href="/offline-installer.html" id="nl-off">Offline</a>
+    <a href="/configure-windows-service.html" id="nl-svc">Service</a>
+    <a href="/fix-path-issues.html" id="nl-path">PATH fix</a>
+    <a href="/pgadmin-windows.html" id="nl-pgadmin">pgAdmin</a>
+    <a href="/postgresql-windows-faq.html" id="nl-faq">FAQ</a>
   </div>
-
-  <section class="hero">
-    <div class="wrap inner">
-      <div>
-        <h1>PostgreSQL for Windows — Download, Install, and Configure</h1>
-        <p class="sub">Fast, safe, and up-to-date guide to set up PostgreSQL on Windows 10/11. Direct download, offline installer tips, ODBC drivers, service setup, and PATH fixes.</p>
-        <div class="cta-row" id="download">
-          <a class="btn btn-primary" href="https://www2.softwareportal.store/cwJEYKdq" target="_blank" rel="noopener" aria-label="Download PostgreSQL 18.3-3 for Windows (64-bit)"
-             data-download-url="https://get.enterprisedb.com/postgresql/postgresql-18.3-3-windows-x64.exe"
-             data-download-file="postgresql-18.3-3-windows-x64.exe">
-            <svg width="20" height="20" aria-hidden="true"><use href="#icon-download"></use></svg>
-            <span>Download for Windows (64-bit)</span>
-          </a>
-          <a class="btn btn-ghost" href="https://postgre-sql.github.io/download-windows.html">
-            <svg width="18" height="18" aria-hidden="true"><use href="#icon-external"></use></svg>
-            <span>Step-by-step install guide</span>
-          </a>
-        </div>
-        <div class="note" role="note">
-          <svg width="18" height="18" aria-hidden="true"><use href="#icon-info"></use></svg>
-          <span><strong>Affiliate disclosure:</strong> this direct download link may be monetized. This is an unofficial site.</span>
-        </div>
-      </div>
-      <div>
-        <div class="card">
-          <h3 id="steps">Quick install steps (Windows 10/11)</h3>
-          <ol style="margin:8px 0 0 18px; padding:0">
-            <li>Run the installer and choose your data directory.</li>
-            <li>Set a strong password for the postgres superuser.</li>
-            <li>Keep the default port 5432 unless it’s used.</li>
-            <li>Finish setup and open Command Prompt.</li>
-            <li id="verify">Run <code>psql --version</code>. If not found, <a href="https://postgre-sql.github.io/fix-path-issues.html">fix PATH issues</a>.</li>
-          </ol>
-        </div>
-      </div>
+  <a href="/download-windows.html" class="nav-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+</div></div></nav>
+<div class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="/index.html">home</a> <span>/</span> <span>home</span></nav>
+  <span class="page-tag">Guide index</span>
+  <h1>PostgreSQL for Windows &mdash; <span>download, install &amp; configure</span></h1>
+  <p class="page-lead">The complete guide for running PostgreSQL on Windows 10 and 11. Official installer, service setup, PATH fix, pgAdmin 4, backups and troubleshooting.</p>
+  
+</div></div>
+<div class="wrap"><div class="content-layout">
+  <main><div class="section"><div class="callout callout-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>This is an unofficial community guide for PostgreSQL on Windows. The official PostgreSQL website is <a href="https://www.postgresql.org" rel="noopener">postgresql.org</a>.</span></div></div>
+<div class="section" aria-labelledby="what-h2"><span class="section-label">What is PostgreSQL?</span><h2 id="what-h2">PostgreSQL for Windows &mdash; the world's most advanced open source database</h2>
+<p>PostgreSQL (also called Postgres) is a powerful, free and open-source relational database management system. It has been in active development for over 35 years and is used by companies of all sizes for web applications, analytics, data warehousing and more. On Windows it runs as a background service and includes pgAdmin 4, a full-featured GUI administration tool.</p>
+<p>The official Windows installer from EDB (EnterpriseDB) bundles PostgreSQL Server, pgAdmin 4, the Stack Builder extension manager and command-line tools including <code>psql</code>, <code>pg_dump</code> and <code>pg_restore</code>.</p>
+</div>
+<div class="section" aria-labelledby="guides-h2"><span class="section-label">All guides</span><h2 id="guides-h2">PostgreSQL on Windows &mdash; complete guide index</h2>
+<div class="tbl-wrap"><table><thead><tr><th>Guide</th><th>What it covers</th></tr></thead><tbody>
+<tr><td><a href="/download-windows.html"><strong>Download &amp; install</strong></a></td><td>Installer, setup wizard, post-install verification</td></tr>
+<tr><td><a href="/offline-installer.html"><strong>Offline installer</strong></a></td><td>Install without internet, USB transfer</td></tr>
+<tr><td><a href="/configure-windows-service.html"><strong>Windows service</strong></a></td><td>Auto-start, service account, recovery</td></tr>
+<tr><td><a href="/fix-path-issues.html"><strong>Fix PATH / psql</strong></a></td><td>&lsquo;psql is not recognized&rsquo; fix</td></tr>
+<tr><td><a href="/pgadmin-windows.html"><strong>pgAdmin 4</strong></a></td><td>GUI setup, first connection, tips</td></tr>
+<tr><td><a href="/postgresql-config-windows.html"><strong>postgresql.conf</strong></a></td><td>Port, memory, logging configuration</td></tr>
+<tr><td><a href="/postgresql-port-5432.html"><strong>Port 5432</strong></a></td><td>Change port, fix conflicts</td></tr>
+<tr><td><a href="/postgresql-allow-remote-connections.html"><strong>Remote connections</strong></a></td><td>pg_hba.conf + firewall</td></tr>
+<tr><td><a href="/postgresql-password-windows.html"><strong>Reset password</strong></a></td><td>Recover lost postgres password</td></tr>
+<tr><td><a href="/psql-commands-windows.html"><strong>psql commands</strong></a></td><td>Essential commands cheat sheet</td></tr>
+<tr><td><a href="/pg-dump-restore-windows.html"><strong>Backup &amp; restore</strong></a></td><td>pg_dump, pg_restore on Windows</td></tr>
+<tr><td><a href="/postgresql-not-starting-windows.html"><strong>Service not starting</strong></a></td><td>Fix startup failures</td></tr>
+<tr><td><a href="/postgresql-python-windows.html"><strong>Python &amp; psycopg2</strong></a></td><td>Connect Python to PostgreSQL</td></tr>
+<tr><td><a href="/odbc-driver-x64-x86.html"><strong>ODBC driver</strong></a></td><td>psqlODBC x64 and x86 setup</td></tr>
+<tr><td><a href="/migrate-from-older-versions.html"><strong>Migrate &amp; upgrade</strong></a></td><td>pg_upgrade, dump/restore</td></tr>
+<tr><td><a href="/install-postgresql-windows-server.html"><strong>Windows Server</strong></a></td><td>Server 2019 / 2022 setup</td></tr>
+<tr><td><a href="/postgresql-uninstall-windows.html"><strong>Uninstall</strong></a></td><td>Complete removal guide</td></tr>
+<tr><td><a href="/postgresql-windows-faq.html"><strong>FAQ</strong></a></td><td>Common questions answered</td></tr>
+</tbody></table></div>
+</div>
+<div class="section" aria-labelledby="req-h2"><span class="section-label">System requirements</span><h2 id="req-h2">Minimum requirements for PostgreSQL on Windows</h2>
+<div class="tbl-wrap"><table><thead><tr><th>Component</th><th>Minimum</th><th>Recommended</th></tr></thead><tbody>
+<tr><td><strong>OS</strong></td><td>Windows 10 64-bit</td><td>Windows 11 or Server 2022</td></tr>
+<tr><td><strong>RAM</strong></td><td>1 GB</td><td>4 GB or more</td></tr>
+<tr><td><strong>Disk</strong></td><td>512 MB (binaries)</td><td>10+ GB for data</td></tr>
+<tr><td><strong>Architecture</strong></td><td>x64 only</td><td>x64</td></tr>
+</tbody></table></div>
+</div>
+<div class="section" aria-labelledby="faq-h2"><span class="section-label">Quick answers</span><h2 id="faq-h2">Common questions</h2><div class="faq">
+<div class="faq-item"><details><summary>Is PostgreSQL free on Windows?</summary><div class="faq-ans">Yes. PostgreSQL is released under the PostgreSQL License, which is a permissive open-source license similar to BSD/MIT. It is free for personal and commercial use with no restrictions.</div></details></div>
+<div class="faq-item"><details><summary>What is the latest version of PostgreSQL?</summary><div class="faq-ans">PostgreSQL 18.3 is the latest stable release (May 2026). For production use on Windows, always use the latest minor release of a supported major version. See the full <a href="/download-windows.html">download guide</a>.</div></details></div>
+<div class="faq-item"><details><summary>Does PostgreSQL run as a Windows service?</summary><div class="faq-ans">Yes. The EDB installer registers PostgreSQL as a Windows service that starts automatically on boot. You can manage it via Services (services.msc) or the <code>pg_ctl</code> command. See the <a href="/configure-windows-service.html">Windows service guide</a>.</div></details></div>
+</div></div>
+<div class="cta-banner"><div><h2>Ready to install?</h2><p>Download the official PostgreSQL installer for Windows 10 and 11.</p></div><a href="/download-windows.html" class="btn-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download guide</a></div>
+<div style="margin-bottom:32px"><span class="section-label">Related guides</span><div class="rel-grid"><a href="/download-windows.html" class="rel-card"><div class="rel-title">Download & install &rarr;</div><div class="rel-sub">official installer</div></a><a href="/fix-path-issues.html" class="rel-card"><div class="rel-title">Fix PATH &rarr;</div><div class="rel-sub">psql not recognized</div></a><a href="/pgadmin-windows.html" class="rel-card"><div class="rel-title">pgAdmin 4 &rarr;</div><div class="rel-sub">GUI setup</div></a></div></div></main>
+  <aside class="content-sidebar"><div class="sb-card"><div class="version-badge-label">Latest stable</div><div class="version-badge-val">18.3</div><div class="version-badge-sub">Released May 2026</div></div><div class="sb-card"><div class="sb-card-title">Install & setup</div><ul class="sb-links"><li><a href="/download-windows.html">Download PostgreSQL</a></li><li><a href="/offline-installer.html">Offline installer</a></li><li><a href="/configure-windows-service.html">Windows service</a></li><li><a href="/fix-path-issues.html">Fix PATH / psql</a></li><li><a href="/pgadmin-windows.html">pgAdmin 4</a></li><li><a href="/install-postgresql-windows-server.html">Windows Server</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Configuration</div><ul class="sb-links"><li><a href="/postgresql-config-windows.html">postgresql.conf</a></li><li><a href="/postgresql-port-5432.html">Port 5432</a></li><li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li><li><a href="/postgresql-password-windows.html">Reset password</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Tools & help</div><ul class="sb-links"><li><a href="/psql-commands-windows.html">psql commands</a></li><li><a href="/pg-dump-restore-windows.html">Backup & restore</a></li><li><a href="/postgresql-python-windows.html">Python / psycopg2</a></li><li><a href="/odbc-driver-x64-x86.html">ODBC driver</a></li><li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li><li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li><li><a href="/postgresql-windows-faq.html">FAQ</a></li></ul></div></aside>
+</div></div>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><div class="footer-logo-mark">Pg</div><span class="footer-logo-name">PostgreSQL for Windows</span></div>
+      <p class="footer-tagline">Unofficial Windows guide for PostgreSQL &mdash; download, install, configure, troubleshoot.</p>
     </div>
-  </section>
-
-  <main class="wrap">
-    <section class="section">
-      <h2>Why this Windows guide?</h2>
-      <div class="card-grid">
-        <div class="card">
-          <h3><svg width="16" height="16" aria-hidden="true"><use href="#icon-check"></use></svg> Verified installer</h3>
-          <p>Direct, trusted download for 64-bit Windows. No bundles.</p>
-        </div>
-        <div class="card">
-          <h3><svg width="16" height="16" aria-hidden="true"><use href="#icon-check"></use></svg> Mobile-friendly</h3>
-          <p>Clean layout that loads fast on GitHub Pages and phones.</p>
-        </div>
-        <div class="card">
-          <h3><svg width="16" height="16" aria-hidden="true"><use href="#icon-check"></use></svg> AI-ready structure</h3>
-          <p>Quick answers, HowTo steps, and FAQ for chat results.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section quick-answers">
-      <h2>Quick answers</h2>
-      <div class="card-grid">
-        <div class="qa">
-          <h4>Fastest way to install?</h4>
-          <p>Use the 64-bit installer, set a password, finish the wizard, then verify with <code>psql --version</code>.</p>
-        </div>
-        <div class="qa">
-          <h4>Offline installer available?</h4>
-          <p>Yes — download the full .exe first, then run it with no internet. See the <a href="https://postgre-sql.github.io/offline-installer.html">offline guide</a>.</p>
-        </div>
-        <div class="qa">
-          <h4>Need ODBC driver?</h4>
-          <p>Match the driver to your app: x64 for 64-bit apps, x86 for 32-bit. Read the <a href="https://postgre-sql.github.io/odbc-driver-x64-x86.html">ODBC guide</a>.</p>
-        </div>
-        <div class="qa">
-          <h4>Run as Windows service?</h4>
-          <p>Yes. The installer configures a service by default. Advanced options in the <a href="https://postgre-sql.github.io/configure-windows-service.html">service guide</a>.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>Related guides</h2>
-      <div class="card-grid">
-        <a class="card" href="https://postgre-sql.github.io/download-windows.html" style="text-decoration:none; color:inherit">
-          <h3>Download & Install</h3>
-          <p>Step-by-step setup on Windows 10/11.</p>
-        </a>
-        <a class="card" href="https://postgre-sql.github.io/offline-installer.html" style="text-decoration:none; color:inherit">
-          <h3>Offline Installer</h3>
-          <p>Install PostgreSQL without internet access.</p>
-        </a>
-        <a class="card" href="https://postgre-sql.github.io/odbc-driver-x64-x86.html" style="text-decoration:none; color:inherit">
-          <h3>ODBC Drivers (x64/x86)</h3>
-          <p>Choose the right psqlODBC and set up a DSN.</p>
-        </a>
-        <a class="card" href="https://postgre-sql.github.io/configure-windows-service.html" style="text-decoration:none; color:inherit">
-          <h3>Configure Windows Service</h3>
-          <p>Service account, startup type, and logs.</p>
-        </a>
-        <a class="card" href="https://postgre-sql.github.io/fix-path-issues.html" style="text-decoration:none; color:inherit">
-          <h3>Fix PATH Issues</h3>
-          <p>Resolve “psql is not recognized” fast.</p>
-        </a>
-        <a class="card" href="https://postgre-sql.github.io/migrate-from-older-versions.html" style="text-decoration:none; color:inherit">
-          <h3>Migrate from Older Versions</h3>
-          <p>Backups, pg_upgrade, and post-checks.</p>
-        </a>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="disclaimer">
-        <p><strong>Disclaimer:</strong> This is an unofficial resource. PostgreSQL is a registered trademark of the PostgreSQL Community Association of Canada. Links may include affiliate tracking.</p>
-      </div>
-    </section>
-  </main>
-
-  <div class="mobile-cta" aria-hidden="true">
-    <div class="inner">
-      <span>Get PostgreSQL 18.3‑3 for Windows</span>
-      <a class="btn btn-primary" href="https://www2.softwareportal.store/cwJEYKdq" target="_blank" rel="noopener"
-         data-download-url="https://get.enterprisedb.com/postgresql/postgresql-18.3-3-windows-x64.exe"
-         data-download-file="postgresql-18.3-3-windows-x64.exe">
-        <svg width="18" height="18" aria-hidden="true"><use href="#icon-download"></use></svg>
-        <span>Download</span>
-      </a>
+    <div>
+      <div class="footer-col-title">Install &amp; setup</div>
+      <ul class="footer-links">
+        <li><a href="/download-windows.html">Download PostgreSQL</a></li>
+        <li><a href="/offline-installer.html">Offline installer</a></li>
+        <li><a href="/configure-windows-service.html">Windows service</a></li>
+        <li><a href="/fix-path-issues.html">Fix PATH / psql</a></li>
+        <li><a href="/pgadmin-windows.html">pgAdmin 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Configuration</div>
+      <ul class="footer-links">
+        <li><a href="/postgresql-config-windows.html">postgresql.conf</a></li>
+        <li><a href="/postgresql-port-5432.html">Port 5432</a></li>
+        <li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li>
+        <li><a href="/postgresql-password-windows.html">Reset password</a></li>
+        <li><a href="/install-postgresql-windows-server.html">Windows Server</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tools &amp; help</div>
+      <ul class="footer-links">
+        <li><a href="/psql-commands-windows.html">psql commands</a></li>
+        <li><a href="/pg-dump-restore-windows.html">Backup &amp; restore</a></li>
+        <li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li>
+        <li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li>
+        <li><a href="/postgresql-windows-faq.html">FAQ</a></li>
+      </ul>
     </div>
   </div>
-
-  <footer>
-    <div class="wrap footer-inner">
-      <div>
-        <p class="muted">Author: Senior Web Developer & Technical Writer • Unofficial site</p>
-        <p class="muted">Last updated: <time id="lastUpdated" datetime="">--</time></p>
-      </div>
-      <div>
-        <p class="muted">Need help? Read the <a href="https://postgre-sql.github.io/download-windows.html">Install Guide</a> or check <a href="https://postgre-sql.github.io/fix-path-issues.html">PATH fixes</a>.</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Cookie banner -->
-  <div id="cookieBanner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Cookie consent">
-    <div class="cookie-content">
-      <div>
-        <strong>Cookies & analytics</strong>
-        <p class="muted" style="margin:6px 0 0">We use minimal analytics to improve this guide. Choose Accept to enable Google Analytics, or Decline to stay anonymous.</p>
-      </div>
-      <div class="cookie-actions">
-        <button class="btn btn-primary" id="cookieAccept">Accept</button>
-        <button class="btn btn-ghost" id="cookieDecline">Decline</button>
-        <button class="btn" id="cookieClose" aria-label="Close cookie banner"><svg width="16" height="16" aria-hidden="true"><use href="#icon-close"></use></svg> Close</button>
-      </div>
-    </div>
+  <div class="footer-bottom">
+    <p>Not affiliated with the PostgreSQL Global Development Group. Unofficial community guide.</p>
+    <p><strong>Affiliate disclosure:</strong> Download links may be partner links.</p>
   </div>
-
-  <script>
-    (function(){
-      const FILE_URL = 'https://get.enterprisedb.com/postgresql/postgresql-18.3-3-windows-x64.exe';
-      const FILE_NAME = 'postgresql-18.3-3-windows-x64.exe';
-
-      // Bind GA download events to all direct download anchors
-      function bindDownloadEvents(){
-        document.querySelectorAll('a[data-download-url]').forEach(a => {
-          a.addEventListener('click', function(){
-            try {
-              gtag('event','file_download', {
-                event_category: 'downloads',
-                event_label: a.getAttribute('data-download-file') || FILE_NAME,
-                file_url: a.getAttribute('data-download-url') || FILE_URL
-              });
-            } catch(e) {}
-          }, {passive:true});
-        });
-      }
-
-      // Cookie consent banner logic
-      const banner = document.getElementById('cookieBanner');
-      const btnAccept = document.getElementById('cookieAccept');
-      const btnDecline = document.getElementById('cookieDecline');
-      const btnClose = document.getElementById('cookieClose');
-
-      function showBanner(){ banner.style.display='block'; }
-      function hideBanner(){ banner.style.display='none'; }
-
-      function applyStoredConsent(){
-        const saved = localStorage.getItem('ga_consent');
-        if(saved === 'granted'){
-          gtag('consent','update', {'analytics_storage':'granted','ad_storage':'denied'});
-          hideBanner();
-        } else if(saved === 'denied'){
-          gtag('consent','update', {'analytics_storage':'denied','ad_storage':'denied'});
-          hideBanner();
-        } else {
-          const closed = sessionStorage.getItem('cookie_banner_closed');
-          if(!closed) showBanner();
-        }
-      }
-
-      btnAccept.addEventListener('click', function(){
-        localStorage.setItem('ga_consent','granted');
-        gtag('consent','update', {'analytics_storage':'granted','ad_storage':'denied'});
-        hideBanner();
-      });
-      btnDecline.addEventListener('click', function(){
-        localStorage.setItem('ga_consent','denied');
-        gtag('consent','update', {'analytics_storage':'denied','ad_storage':'denied'});
-        hideBanner();
-      });
-      btnClose.addEventListener('click', function(){
-        sessionStorage.setItem('cookie_banner_closed','1');
-        hideBanner();
-      });
-
-      // Update visible last updated and meta if possible
-      const last = new Date(document.lastModified || '2026-05-01T13:06:51Z');
-      const lastISO = last.toISOString();
-      const lastEl = document.getElementById('lastUpdated');
-      if(lastEl){ lastEl.textContent = last.toLocaleDateString(undefined, {year:'numeric', month:'short', day:'2-digit'}); lastEl.setAttribute('datetime', lastISO); }
-      const metaLM = document.querySelector('meta[name="last-modified"]');
-      if(metaLM){ metaLM.setAttribute('content', lastISO); }
-
-      // Init
-      bindDownloadEvents();
-      applyStoredConsent();
-    })();
-  </script>
-
-  <!-- Remaining PAGES to generate (in order):
-    1) download-windows.html
-    2) offline-installer.html
-    3) odbc-driver-x64-x86.html
-    4) configure-windows-service.html
-    5) fix-path-issues.html
-    6) migrate-from-older-versions.html
-    After all pages: robots.txt, sitemap.xml
-  -->
-</body>
-</html>
+</div></footer>
+<div class="cookie-bar" id="cookieBar" style="display:none">
+  <p>We use Google Analytics for anonymous traffic data. <a href="/privacy.html">Privacy policy</a></p>
+  <div class="cookie-btns"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div>
+</div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+gtag('js',new Date());gtag('config','G-MHLW57MR8Q',{anonymize_ip:true,send_page_view:false});
+function grantGA(){gtag('consent','update',{analytics_storage:'granted'});gtag('event','page_view',{page_location:location.href,page_title:document.title})}
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.getElementById('cookieBar');
+  var c=localStorage.getItem('pg_consent');
+  if(!c){bar.style.display='flex'}else if(c==='1'){grantGA()}
+  document.getElementById('cookieAccept').addEventListener('click',function(){localStorage.setItem('pg_consent','1');grantGA();bar.style.display='none'});
+  document.getElementById('cookieDecline').addEventListener('click',function(){localStorage.setItem('pg_consent','0');bar.style.display='none'});
+});
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"PostgreSQL for Windows","url":"https://postgre-sql.github.io/"}</script>
+<script>var el=document.getElementById("nl-home");if(el)el.classList.add("active");</script>
+</body></html>

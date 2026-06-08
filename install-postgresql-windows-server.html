@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Install PostgreSQL on Windows Server 2019 and 2022 — Production Guide</title>
+  <meta name="description" content="How to install PostgreSQL on Windows Server 2016, 2019 and 2022. Separate data volume, dedicated service account, firewall setup, silent install on Server Core.">
+  <link rel="canonical" href="https://postgre-sql.github.io/install-postgresql-windows-server.html">
+  <meta name="last-modified" content="2026-06-08">
+  <meta property="og:title" content="Install PostgreSQL on Windows Server 2019 and 2022 — Production Guide">
+  <meta property="og:description" content="How to install PostgreSQL on Windows Server 2016, 2019 and 2022. Separate data volume, dedicated service account, firewall setup, silent install on Server Core.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://postgre-sql.github.io/install-postgresql-windows-server.html">
+  <meta property="og:image" content="https://postgre-sql.github.io/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav class="site-nav"><div class="wrap"><div class="nav-inner">
+  <a href="/index.html" class="nav-logo"><div class="nav-logo-mark">Pg</div><span class="nav-logo-name">PostgreSQL</span><span class="nav-logo-sub">for Windows</span></a>
+  <div class="nav-links">
+    <a href="/index.html" id="nl-home">Home</a>
+    <a href="/download-windows.html" id="nl-dl">Download</a>
+    <a href="/offline-installer.html" id="nl-off">Offline</a>
+    <a href="/configure-windows-service.html" id="nl-svc">Service</a>
+    <a href="/fix-path-issues.html" id="nl-path">PATH fix</a>
+    <a href="/pgadmin-windows.html" id="nl-pgadmin">pgAdmin</a>
+    <a href="/postgresql-windows-faq.html" id="nl-faq">FAQ</a>
+  </div>
+  <a href="/download-windows.html" class="nav-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+</div></div></nav>
+<div class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="/index.html">home</a> <span>/</span> <span>install-postgresql-windows-server</span></nav>
+  <span class="page-tag">Server guide</span>
+  <h1>Install PostgreSQL on Windows Server &mdash; <span>2019 &amp; 2022 production guide</span></h1>
+  <p class="page-lead">Install PostgreSQL on Windows Server 2016, 2019 and 2022. Covers RDP install, separate data volume, dedicated service account, Windows Firewall and silent install on Server Core.</p>
+  
+</div></div>
+<div class="wrap"><div class="content-layout">
+  <main><div class="callout callout-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>The PostgreSQL EDB installer works on Windows Server 2016, 2019 and 2022. The installation steps are identical to Windows 10/11 with a few additional considerations for server environments.</span></div>
+<div class="section" aria-labelledby="req-h2"><span class="section-label">Requirements</span><h2 id="req-h2">Windows Server requirements for PostgreSQL</h2>
+<div class="tbl-wrap"><table><thead><tr><th>Component</th><th>Minimum</th><th>Recommended</th></tr></thead><tbody>
+<tr><td><strong>OS</strong></td><td>Windows Server 2016</td><td>Windows Server 2022</td></tr>
+<tr><td><strong>RAM</strong></td><td>2 GB</td><td>8 GB or more</td></tr>
+<tr><td><strong>Disk</strong></td><td>1 GB (binaries) + data</td><td>SSD, separate volume for data</td></tr>
+<tr><td><strong>Architecture</strong></td><td>x64 only</td><td>x64</td></tr>
+<tr><td><strong>Net Framework</strong></td><td>4.6+</td><td>Latest</td></tr>
+</tbody></table></div>
+</div>
+<div class="section" aria-labelledby="install-h2"><span class="section-label">Installation</span><h2 id="install-h2">Install PostgreSQL on Windows Server</h2>
+<ul class="steps">
+<li class="step"><div class="step-n">1</div><div><h3>Download the installer</h3><p>Get the EDB installer from <a href="https://www.postgresql.org/download/windows/" rel="noopener">postgresql.org/download/windows</a> on a machine with internet access. Transfer to the server via RDP file copy, network share, or USB.</p></div></li>
+<li class="step"><div class="step-n">2</div><div><h3>Run as Administrator via RDP</h3><p>Connect via Remote Desktop. Right-click the installer &rarr; <strong>Run as administrator</strong>. If UAC is disabled on the server, you may need to explicitly right-click and choose Run as administrator to get elevated privileges.</p></div></li>
+<li class="step"><div class="step-n">3</div><div><h3>Place data on a separate volume</h3><p>On production servers, store PostgreSQL data on a separate disk or volume from the OS. During setup, change the data directory to your data volume (e.g. <code>D:\PostgreSQL8\data</code>). This improves performance and simplifies backup.</p></div></li>
+<li class="step"><div class="step-n">4</div><div><h3>Create a dedicated service account (optional but recommended)</h3>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">PowerShell &mdash; Administrator</span></div><div class="term-body"><div><span class="t-cm"># Create a local service account:</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">New-LocalUser -Name "pgservice" -NoPassword -Description "PostgreSQL service account"</span></div><div></div><div><span class="t-cm"># Grant Log on as a service right (via secpol.msc or Group Policy)</span></div><div><span class="t-cm"># Then set the service to use this account:</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">sc.exe config postgresql-x64-18 obj= ".\pgservice" password= ""</span></div></div></div>
+</div></li>
+<li class="step"><div class="step-n">5</div><div><h3>Open Windows Firewall for remote connections</h3>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">PowerShell &mdash; Administrator</span></div><div class="term-body"><div><span class="t-p">PS&gt;</span> <span class="t-c">New-NetFirewallRule -DisplayName "PostgreSQL" -Direction Inbound -Protocol TCP -LocalPort 5432 -Action Allow</span></div></div></div>
+<p>Then update <code>pg_hba.conf</code> and <code>postgresql.conf</code> to allow remote connections. See <a href="/postgresql-allow-remote-connections.html">Remote connections guide</a>.</p>
+</div></li>
+</ul>
+</div>
+<div class="section" aria-labelledby="core-h2"><span class="section-label">Server Core</span><h2 id="core-h2">Install on Windows Server Core (no GUI)</h2>
+<p>On Windows Server Core without a GUI, run the installer silently from the command line:</p>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe &mdash; Administrator</span></div><div class="term-body"><div><span class="t-p">C:\&gt;</span> <span class="t-c">postgresql-18.3-3-windows-x64.exe --mode unattended --superpassword "YourSecurePass" --serverport 5432</span></div><div><span class="t-cm"># Installer runs silently, logs to %TEMP%\postgresql_installer.log</span></div><div></div><div><span class="t-cm"># Verify after completion:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">sc query postgresql-x64-18</span></div><div><span class="t-v">STATE : 4  RUNNING</span></div></div></div>
+</div>
+<div class="section" aria-labelledby="faq-h2"><span class="section-label">FAQ</span><h2 id="faq-h2">Windows Server questions</h2><div class="faq">
+<div class="faq-item"><details><summary>Should I install PostgreSQL on Windows Server or use Linux?</summary><div class="faq-ans">Both work well. PostgreSQL on Windows Server is production-ready and fully supported by EDB. Linux (especially RHEL/Ubuntu) has a larger community of PostgreSQL operators and some performance advantages due to better OS-level memory management. For a Windows-centric environment or team, Windows Server is a perfectly valid choice.</div></details></div>
+<div class="faq-item"><details><summary>Does PostgreSQL work on Windows Server Core?</summary><div class="faq-ans">Yes. Use the silent/unattended installer as shown above. pgAdmin will not be available on Server Core (no browser), but you can manage the server remotely via pgAdmin from another machine or via psql from the command line.</div></details></div>
+<div class="faq-item"><details><summary>How do I enable PostgreSQL to survive server reboots?</summary><div class="faq-ans">The EDB installer sets the service startup type to Automatic by default. Verify with <code>sc query postgresql-x64-18</code>. If needed, set it explicitly: <code>sc config postgresql-x64-18 start= auto</code>.</div></details></div>
+</div></div>
+<div class="cta-banner"><div><h2>Need remote access from other machines?</h2><p>Configure firewall and pg_hba.conf for network connections.</p></div><a href="/postgresql-allow-remote-connections.html" class="btn-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Remote connections</a></div>
+<div style="margin-bottom:32px"><span class="section-label">Related guides</span><div class="rel-grid"><a href="/postgresql-allow-remote-connections.html" class="rel-card"><div class="rel-title">Remote connections &rarr;</div><div class="rel-sub">firewall + pg_hba.conf</div></a><a href="/configure-windows-service.html" class="rel-card"><div class="rel-title">Windows service &rarr;</div><div class="rel-sub">service management</div></a><a href="/pg-dump-restore-windows.html" class="rel-card"><div class="rel-title">Backup guide &rarr;</div><div class="rel-sub">production backups</div></a></div></div></main>
+  <aside class="content-sidebar"><div class="sb-card"><div class="version-badge-label">Latest stable</div><div class="version-badge-val">18.3</div><div class="version-badge-sub">Released May 2026</div></div><div class="sb-card"><div class="sb-card-title">Install & setup</div><ul class="sb-links"><li><a href="/download-windows.html">Download PostgreSQL</a></li><li><a href="/offline-installer.html">Offline installer</a></li><li><a href="/configure-windows-service.html">Windows service</a></li><li><a href="/fix-path-issues.html">Fix PATH / psql</a></li><li><a href="/pgadmin-windows.html">pgAdmin 4</a></li><li><a href="/install-postgresql-windows-server.html" class="cur">Windows Server</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Configuration</div><ul class="sb-links"><li><a href="/postgresql-config-windows.html">postgresql.conf</a></li><li><a href="/postgresql-port-5432.html">Port 5432</a></li><li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li><li><a href="/postgresql-password-windows.html">Reset password</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Tools & help</div><ul class="sb-links"><li><a href="/psql-commands-windows.html">psql commands</a></li><li><a href="/pg-dump-restore-windows.html">Backup & restore</a></li><li><a href="/postgresql-python-windows.html">Python / psycopg2</a></li><li><a href="/odbc-driver-x64-x86.html">ODBC driver</a></li><li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li><li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li><li><a href="/postgresql-windows-faq.html">FAQ</a></li></ul></div></aside>
+</div></div>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><div class="footer-logo-mark">Pg</div><span class="footer-logo-name">PostgreSQL for Windows</span></div>
+      <p class="footer-tagline">Unofficial Windows guide for PostgreSQL &mdash; download, install, configure, troubleshoot.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Install &amp; setup</div>
+      <ul class="footer-links">
+        <li><a href="/download-windows.html">Download PostgreSQL</a></li>
+        <li><a href="/offline-installer.html">Offline installer</a></li>
+        <li><a href="/configure-windows-service.html">Windows service</a></li>
+        <li><a href="/fix-path-issues.html">Fix PATH / psql</a></li>
+        <li><a href="/pgadmin-windows.html">pgAdmin 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Configuration</div>
+      <ul class="footer-links">
+        <li><a href="/postgresql-config-windows.html">postgresql.conf</a></li>
+        <li><a href="/postgresql-port-5432.html">Port 5432</a></li>
+        <li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li>
+        <li><a href="/postgresql-password-windows.html">Reset password</a></li>
+        <li><a href="/install-postgresql-windows-server.html">Windows Server</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tools &amp; help</div>
+      <ul class="footer-links">
+        <li><a href="/psql-commands-windows.html">psql commands</a></li>
+        <li><a href="/pg-dump-restore-windows.html">Backup &amp; restore</a></li>
+        <li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li>
+        <li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li>
+        <li><a href="/postgresql-windows-faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Not affiliated with the PostgreSQL Global Development Group. Unofficial community guide.</p>
+    <p><strong>Affiliate disclosure:</strong> Download links may be partner links.</p>
+  </div>
+</div></footer>
+<div class="cookie-bar" id="cookieBar" style="display:none">
+  <p>We use Google Analytics for anonymous traffic data. <a href="/privacy.html">Privacy policy</a></p>
+  <div class="cookie-btns"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div>
+</div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+gtag('js',new Date());gtag('config','G-MHLW57MR8Q',{anonymize_ip:true,send_page_view:false});
+function grantGA(){gtag('consent','update',{analytics_storage:'granted'});gtag('event','page_view',{page_location:location.href,page_title:document.title})}
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.getElementById('cookieBar');
+  var c=localStorage.getItem('pg_consent');
+  if(!c){bar.style.display='flex'}else if(c==='1'){grantGA()}
+  document.getElementById('cookieAccept').addEventListener('click',function(){localStorage.setItem('pg_consent','1');grantGA();bar.style.display='none'});
+  document.getElementById('cookieDecline').addEventListener('click',function(){localStorage.setItem('pg_consent','0');bar.style.display='none'});
+});
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Install PostgreSQL on Windows Server","description":"How to install PostgreSQL on Windows Server 2019 and 2022 for production use.","step":[{"@type":"HowToStep","position":1,"name":"Download installer","text":"Get EDB installer from postgresql.org/download/windows"},{"@type":"HowToStep","position":2,"name":"Run as Administrator","text":"Right-click installer > Run as administrator"},{"@type":"HowToStep","position":3,"name":"Separate data volume","text":"Set data directory to D:\\PostgreSQL\\18\\data"},{"@type":"HowToStep","position":4,"name":"Configure firewall","text":"Open port 5432 in Windows Firewall"}]}</script>
+<script>var el=document.getElementById("nl-home");if(el)el.classList.add("active");</script>
+</body></html>

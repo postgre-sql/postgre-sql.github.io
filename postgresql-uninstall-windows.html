@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Uninstall PostgreSQL on Windows — Complete Removal Guide</title>
+  <meta name="description" content="How to completely uninstall PostgreSQL on Windows 10 and 11. Stop the service, run uninstaller, delete data directory, remove firewall rules and PATH entries.">
+  <link rel="canonical" href="https://postgre-sql.github.io/postgresql-uninstall-windows.html">
+  <meta name="last-modified" content="2026-06-08">
+  <meta property="og:title" content="Uninstall PostgreSQL on Windows — Complete Removal Guide">
+  <meta property="og:description" content="How to completely uninstall PostgreSQL on Windows 10 and 11. Stop the service, run uninstaller, delete data directory, remove firewall rules and PATH entries.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://postgre-sql.github.io/postgresql-uninstall-windows.html">
+  <meta property="og:image" content="https://postgre-sql.github.io/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav class="site-nav"><div class="wrap"><div class="nav-inner">
+  <a href="/index.html" class="nav-logo"><div class="nav-logo-mark">Pg</div><span class="nav-logo-name">PostgreSQL</span><span class="nav-logo-sub">for Windows</span></a>
+  <div class="nav-links">
+    <a href="/index.html" id="nl-home">Home</a>
+    <a href="/download-windows.html" id="nl-dl">Download</a>
+    <a href="/offline-installer.html" id="nl-off">Offline</a>
+    <a href="/configure-windows-service.html" id="nl-svc">Service</a>
+    <a href="/fix-path-issues.html" id="nl-path">PATH fix</a>
+    <a href="/pgadmin-windows.html" id="nl-pgadmin">pgAdmin</a>
+    <a href="/postgresql-windows-faq.html" id="nl-faq">FAQ</a>
+  </div>
+  <a href="/download-windows.html" class="nav-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+</div></div></nav>
+<div class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="/index.html">home</a> <span>/</span> <span>postgresql-uninstall-windows</span></nav>
+  <span class="page-tag">Uninstall guide</span>
+  <h1>Uninstall PostgreSQL on Windows &mdash; <span>complete removal guide</span></h1>
+  <p class="page-lead">Completely remove PostgreSQL from Windows. Back up databases first, stop the service, run the uninstaller, delete the data directory and clean up firewall rules and PATH.</p>
+  
+</div></div>
+<div class="wrap"><div class="content-layout">
+  <main><div class="callout callout-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Uninstalling PostgreSQL via Settings does <strong>not</strong> delete your databases. The data directory remains on disk until you manually delete it.</span></div>
+<div class="section" aria-labelledby="steps-h2"><span class="section-label">Uninstall steps</span><h2 id="steps-h2">Completely remove PostgreSQL from Windows</h2><ul class="steps">
+<li class="step"><div class="step-n">1</div><div><h3>Back up your databases first</h3>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe</span></div><div class="term-body"><div><span class="t-cm"># Back up all databases before uninstalling:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">pg_dumpall -U postgres -f C:\backup\final_backup.sql</span></div></div></div>
+<div class="callout callout-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>This is your last chance to export your data. Once the service is removed, you cannot use pg_dumpall.</span></div>
+</div></li>
+<li class="step"><div class="step-n">2</div><div><h3>Stop the service</h3>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe &mdash; Administrator</span></div><div class="term-body"><div><span class="t-p">C:\&gt;</span> <span class="t-c">net stop postgresql-x64-18</span></div><div><span class="t-ok">The postgresql-x64-18 service was stopped successfully.</span></div></div></div>
+</div></li>
+<li class="step"><div class="step-n">3</div><div><h3>Uninstall via Settings or the EDB uninstaller</h3><p>Settings &rarr; Apps &rarr; Installed apps &rarr; search <strong>PostgreSQL</strong> &rarr; click the three-dot menu &rarr; <strong>Uninstall</strong>. Or run the uninstaller directly:</p>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe &mdash; Administrator</span></div><div class="term-body"><div><span class="t-cm"># Run the EDB uninstaller directly:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">"C:\Program Files\PostgreSQL\18\uninstall-postgresql.exe"</span></div></div></div>
+</div></li>
+<li class="step"><div class="step-n">4</div><div><h3>Delete the data directory to free disk space</h3><p>The uninstaller leaves the data directory intact. Delete it manually to free disk space:</p>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">PowerShell &mdash; Administrator</span></div><div class="term-body"><div><span class="t-cm"># Check size first:</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">(Get-ChildItem "C:\Program Files\PostgreSQL" -Recurse | Measure-Object Length -Sum).Sum / 1GB</span></div><div></div><div><span class="t-cm"># Delete the entire PostgreSQL folder:</span></div><div><span class="t-p">PS&gt;</span> <span class="t-c">Remove-Item "C:\Program Files\PostgreSQL" -Recurse -Force</span></div></div></div>
+</div></li>
+<li class="step"><div class="step-n">5</div><div><h3>Remove Windows Firewall rule</h3>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">PowerShell &mdash; Administrator</span></div><div class="term-body"><div><span class="t-p">PS&gt;</span> <span class="t-c">Remove-NetFirewallRule -DisplayName "PostgreSQL 5432"</span></div></div></div>
+</div></li>
+<li class="step"><div class="step-n">6</div><div><h3>Clean up PATH</h3><p>Settings &rarr; System &rarr; Advanced system settings &rarr; Environment Variables &rarr; select <strong>Path</strong> under User variables &rarr; Edit &rarr; remove any PostgreSQL entries.</p></div></li>
+</ul></div>
+<div class="section" aria-labelledby="leftovers-h2"><span class="section-label">Remaining files</span><h2 id="leftovers-h2">What the uninstaller leaves behind</h2>
+<div class="tbl-wrap"><table><thead><tr><th>Location</th><th>Contents</th><th>Safe to delete?</th></tr></thead><tbody>
+<tr><td><code>C:\Program Files\PostgreSQL\18\data</code></td><td>All your databases</td><td class="td-ok">Yes &mdash; after backing up</td></tr>
+<tr><td><code>%APPDATA%\postgresql</code></td><td>pgpass.conf, user config</td><td class="td-ok">Yes</td></tr>
+<tr><td><code>%APPDATA%\pgAdmin 4</code></td><td>pgAdmin settings, saved queries</td><td class="td-ok">Yes</td></tr>
+<tr><td>PATH environment variable</td><td>PostgreSQL bin path entry</td><td class="td-ok">Remove via Environment Variables</td></tr>
+</tbody></table></div>
+</div>
+<div class="section" aria-labelledby="faq-h2"><span class="section-label">FAQ</span><h2 id="faq-h2">Uninstall questions</h2><div class="faq">
+<div class="faq-item"><details><summary>Does uninstalling PostgreSQL delete my databases?</summary><div class="faq-ans">No. The EDB uninstaller removes the server binaries and service registration but leaves the data directory completely untouched. Your databases are safe until you manually delete the data folder.</div></details></div>
+<div class="faq-item"><details><summary>How do I uninstall multiple PostgreSQL versions?</summary><div class="faq-ans">Repeat the process for each version. Each major version has its own uninstaller at <code>C:\Program Files\PostgreSQL\{version}\uninstall-postgresql.exe</code> and its own service name (<code>postgresql-x64-16</code>, <code>postgresql-x64-17</code>, etc.).</div></details></div>
+<div class="faq-item"><details><summary>PostgreSQL does not appear in Settings &rarr; Apps</summary><div class="faq-ans">Run the uninstaller directly from <code>C:\Program Files\PostgreSQL\{version}\uninstall-postgresql.exe</code>. If the binary is missing, manually stop and delete the service: <code>sc stop postgresql-x64-18</code> then <code>sc delete postgresql-x64-18</code>.</div></details></div>
+</div></div>
+<div class="cta-banner"><div><h2>Reinstalling PostgreSQL?</h2><p>Follow the full download and setup guide.</p></div><a href="/download-windows.html" class="btn-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download guide</a></div>
+<div style="margin-bottom:32px"><span class="section-label">Related guides</span><div class="rel-grid"><a href="/download-windows.html" class="rel-card"><div class="rel-title">Download &rarr;</div><div class="rel-sub">reinstall PostgreSQL</div></a><a href="/pg-dump-restore-windows.html" class="rel-card"><div class="rel-title">Backup guide &rarr;</div><div class="rel-sub">back up first</div></a><a href="/migrate-from-older-versions.html" class="rel-card"><div class="rel-title">Upgrade guide &rarr;</div><div class="rel-sub">upgrade instead</div></a></div></div></main>
+  <aside class="content-sidebar"><div class="sb-card"><div class="version-badge-label">Latest stable</div><div class="version-badge-val">18.3</div><div class="version-badge-sub">Released May 2026</div></div><div class="sb-card"><div class="sb-card-title">Install & setup</div><ul class="sb-links"><li><a href="/download-windows.html">Download PostgreSQL</a></li><li><a href="/offline-installer.html">Offline installer</a></li><li><a href="/configure-windows-service.html">Windows service</a></li><li><a href="/fix-path-issues.html">Fix PATH / psql</a></li><li><a href="/pgadmin-windows.html">pgAdmin 4</a></li><li><a href="/install-postgresql-windows-server.html">Windows Server</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Configuration</div><ul class="sb-links"><li><a href="/postgresql-config-windows.html">postgresql.conf</a></li><li><a href="/postgresql-port-5432.html">Port 5432</a></li><li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li><li><a href="/postgresql-password-windows.html">Reset password</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Tools & help</div><ul class="sb-links"><li><a href="/psql-commands-windows.html">psql commands</a></li><li><a href="/pg-dump-restore-windows.html">Backup & restore</a></li><li><a href="/postgresql-python-windows.html">Python / psycopg2</a></li><li><a href="/odbc-driver-x64-x86.html">ODBC driver</a></li><li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li><li><a href="/postgresql-uninstall-windows.html" class="cur">Uninstall</a></li><li><a href="/postgresql-windows-faq.html">FAQ</a></li></ul></div></aside>
+</div></div>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><div class="footer-logo-mark">Pg</div><span class="footer-logo-name">PostgreSQL for Windows</span></div>
+      <p class="footer-tagline">Unofficial Windows guide for PostgreSQL &mdash; download, install, configure, troubleshoot.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Install &amp; setup</div>
+      <ul class="footer-links">
+        <li><a href="/download-windows.html">Download PostgreSQL</a></li>
+        <li><a href="/offline-installer.html">Offline installer</a></li>
+        <li><a href="/configure-windows-service.html">Windows service</a></li>
+        <li><a href="/fix-path-issues.html">Fix PATH / psql</a></li>
+        <li><a href="/pgadmin-windows.html">pgAdmin 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Configuration</div>
+      <ul class="footer-links">
+        <li><a href="/postgresql-config-windows.html">postgresql.conf</a></li>
+        <li><a href="/postgresql-port-5432.html">Port 5432</a></li>
+        <li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li>
+        <li><a href="/postgresql-password-windows.html">Reset password</a></li>
+        <li><a href="/install-postgresql-windows-server.html">Windows Server</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tools &amp; help</div>
+      <ul class="footer-links">
+        <li><a href="/psql-commands-windows.html">psql commands</a></li>
+        <li><a href="/pg-dump-restore-windows.html">Backup &amp; restore</a></li>
+        <li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li>
+        <li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li>
+        <li><a href="/postgresql-windows-faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Not affiliated with the PostgreSQL Global Development Group. Unofficial community guide.</p>
+    <p><strong>Affiliate disclosure:</strong> Download links may be partner links.</p>
+  </div>
+</div></footer>
+<div class="cookie-bar" id="cookieBar" style="display:none">
+  <p>We use Google Analytics for anonymous traffic data. <a href="/privacy.html">Privacy policy</a></p>
+  <div class="cookie-btns"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div>
+</div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+gtag('js',new Date());gtag('config','G-MHLW57MR8Q',{anonymize_ip:true,send_page_view:false});
+function grantGA(){gtag('consent','update',{analytics_storage:'granted'});gtag('event','page_view',{page_location:location.href,page_title:document.title})}
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.getElementById('cookieBar');
+  var c=localStorage.getItem('pg_consent');
+  if(!c){bar.style.display='flex'}else if(c==='1'){grantGA()}
+  document.getElementById('cookieAccept').addEventListener('click',function(){localStorage.setItem('pg_consent','1');grantGA();bar.style.display='none'});
+  document.getElementById('cookieDecline').addEventListener('click',function(){localStorage.setItem('pg_consent','0');bar.style.display='none'});
+});
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Uninstall PostgreSQL on Windows","description":"How to completely remove PostgreSQL from Windows 10 and 11.","step":[{"@type":"HowToStep","position":1,"name":"Back up databases","text":"pg_dumpall -U postgres -f backup.sql"},{"@type":"HowToStep","position":2,"name":"Stop service","text":"net stop postgresql-x64-18"},{"@type":"HowToStep","position":3,"name":"Run uninstaller","text":"Settings > Apps > PostgreSQL > Uninstall"},{"@type":"HowToStep","position":4,"name":"Delete data","text":"Remove-Item C:\\Program Files\\PostgreSQL -Recurse -Force"}]}</script>
+<script>var el=document.getElementById("nl-home");if(el)el.classList.add("active");</script>
+</body></html>

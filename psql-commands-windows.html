@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>psql Commands for Windows — Essential PostgreSQL CLI Cheat Sheet</title>
+  <meta name="description" content="Essential psql commands for Windows: connect, list databases, create users, run queries, describe tables and admin operations. Complete cheat sheet with examples.">
+  <link rel="canonical" href="https://postgre-sql.github.io/psql-commands-windows.html">
+  <meta name="last-modified" content="2026-06-08">
+  <meta property="og:title" content="psql Commands for Windows — Essential PostgreSQL CLI Cheat Sheet">
+  <meta property="og:description" content="Essential psql commands for Windows: connect, list databases, create users, run queries, describe tables and admin operations. Complete cheat sheet with examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://postgre-sql.github.io/psql-commands-windows.html">
+  <meta property="og:image" content="https://postgre-sql.github.io/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav class="site-nav"><div class="wrap"><div class="nav-inner">
+  <a href="/index.html" class="nav-logo"><div class="nav-logo-mark">Pg</div><span class="nav-logo-name">PostgreSQL</span><span class="nav-logo-sub">for Windows</span></a>
+  <div class="nav-links">
+    <a href="/index.html" id="nl-home">Home</a>
+    <a href="/download-windows.html" id="nl-dl">Download</a>
+    <a href="/offline-installer.html" id="nl-off">Offline</a>
+    <a href="/configure-windows-service.html" id="nl-svc">Service</a>
+    <a href="/fix-path-issues.html" id="nl-path">PATH fix</a>
+    <a href="/pgadmin-windows.html" id="nl-pgadmin">pgAdmin</a>
+    <a href="/postgresql-windows-faq.html" id="nl-faq">FAQ</a>
+  </div>
+  <a href="/download-windows.html" class="nav-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+</div></div></nav>
+<div class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="/index.html">home</a> <span>/</span> <span>psql-commands-windows</span></nav>
+  <span class="page-tag">psql guide</span>
+  <h1>psql commands for Windows &mdash; <span>essential CLI cheat sheet</span></h1>
+  <p class="page-lead">The most useful psql commands for PostgreSQL on Windows. Covers connecting, backslash meta-commands, database and table operations, and common admin queries &mdash; all with copy-paste examples.</p>
+  
+</div></div>
+<div class="wrap"><div class="content-layout">
+  <main><div class="callout callout-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Make sure PostgreSQL bin is on your PATH before running these commands. If psql is not recognized, see <a href="/fix-path-issues.html">Fix PATH issues</a>.</span></div>
+<div class="section" aria-labelledby="connect-h2"><span class="section-label">Connect</span><h2 id="connect-h2">Connect to PostgreSQL with psql</h2>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">cmd.exe</span></div><div class="term-body"><div><span class="t-cm"># Connect as postgres superuser:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">psql -U postgres</span></div><div><span class="t-o">Password for user postgres:</span></div><div><span class="t-v">psql (18.3)</span></div><div><span class="t-v">Type "help" for help.</span></div><div><span class="t-ok">postgres=#</span></div><div></div><div><span class="t-cm"># Connect to a specific database:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">psql -U postgres -d mydb</span></div><div></div><div><span class="t-cm"># Connect to a remote server:</span></div><div><span class="t-p">C:\&gt;</span> <span class="t-c">psql -h 192.168.1.10 -U postgres -d mydb -p 5432</span></div></div></div>
+</div>
+<div class="section" aria-labelledby="meta-h2"><span class="section-label">Meta commands</span><h2 id="meta-h2">Essential psql backslash commands</h2>
+<div class="tbl-wrap"><table><thead><tr><th>Command</th><th>What it does</th></tr></thead><tbody>
+<tr><td><code>\l</code></td><td>List all databases</td></tr>
+<tr><td><code>\c dbname</code></td><td>Connect to database</td></tr>
+<tr><td><code>\dt</code></td><td>List tables in current schema</td></tr>
+<tr><td><code>\dt *.*</code></td><td>List all tables in all schemas</td></tr>
+<tr><td><code>\d tablename</code></td><td>Describe table (columns, types, indexes)</td></tr>
+<tr><td><code>\du</code></td><td>List users and roles</td></tr>
+<tr><td><code>\dn</code></td><td>List schemas</td></tr>
+<tr><td><code>\di</code></td><td>List indexes</td></tr>
+<tr><td><code>\df</code></td><td>List functions</td></tr>
+<tr><td><code>\x</code></td><td>Toggle expanded output (wide columns)</td></tr>
+<tr><td><code>\i file.sql</code></td><td>Execute SQL from a file</td></tr>
+<tr><td><code>\o output.txt</code></td><td>Send output to file</td></tr>
+<tr><td><code>\timing</code></td><td>Toggle query execution time display</td></tr>
+<tr><td><code>\e</code></td><td>Open query in external editor</td></tr>
+<tr><td><code>\q</code></td><td>Quit psql</td></tr>
+</tbody></table></div>
+</div>
+<div class="section" aria-labelledby="db-h2"><span class="section-label">Database operations</span><h2 id="db-h2">Common database operations</h2>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">psql</span></div><div class="term-body"><div><span class="t-cm">-- Create a database:</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">CREATE DATABASE myapp;</span></div><div></div><div><span class="t-cm">-- Create a user with password:</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">CREATE USER myuser WITH PASSWORD 'securepass';</span></div><div></div><div><span class="t-cm">-- Grant all privileges on database to user:</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">GRANT ALL PRIVILEGES ON DATABASE myapp TO myuser;</span></div><div></div><div><span class="t-cm">-- Drop a database (disconnect users first):</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">DROP DATABASE IF EXISTS myapp;</span></div></div></div>
+</div>
+<div class="section" aria-labelledby="table-h2"><span class="section-label">Table operations</span><h2 id="table-h2">Create, query and manage tables</h2>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">psql</span></div><div class="term-body"><div><span class="t-cm">-- Create a table:</span></div><div><span class="t-p">mydb=#</span> <span class="t-c">CREATE TABLE users (id SERIAL PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE, created_at TIMESTAMPTZ DEFAULT NOW());</span></div><div></div><div><span class="t-cm">-- Insert a row:</span></div><div><span class="t-p">mydb=#</span> <span class="t-c">INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com');</span></div><div></div><div><span class="t-cm">-- Query rows:</span></div><div><span class="t-p">mydb=#</span> <span class="t-c">SELECT * FROM users LIMIT 10;</span></div><div></div><div><span class="t-cm">-- Describe table structure:</span></div><div><span class="t-p">mydb=#</span> <span class="t-c">\d users</span></div></div></div>
+</div>
+<div class="section" aria-labelledby="admin-h2"><span class="section-label">Admin commands</span><h2 id="admin-h2">Useful admin queries</h2>
+<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><span class="term-label">psql</span></div><div class="term-body"><div><span class="t-cm">-- Show server version:</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">SELECT version();</span></div><div></div><div><span class="t-cm">-- Show active connections:</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">SELECT pid, usename, application_name, state FROM pg_stat_activity;</span></div><div></div><div><span class="t-cm">-- Show database sizes:</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">SELECT datname, pg_size_pretty(pg_database_size(datname)) FROM pg_database ORDER BY pg_database_size(datname) DESC;</span></div><div></div><div><span class="t-cm">-- Kill a connection by PID:</span></div><div><span class="t-p">postgres=#</span> <span class="t-c">SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid = 12345;</span></div></div></div>
+</div>
+<div class="section" aria-labelledby="faq-h2"><span class="section-label">FAQ</span><h2 id="faq-h2">psql questions</h2><div class="faq">
+<div class="faq-item"><details><summary>How do I run a SQL file with psql?</summary><div class="faq-ans">Use <code>psql -U postgres -d mydb -f C:\path	o\script.sql</code> from the command line. Or inside psql: <code>\i C:/path/to/script.sql</code> (use forward slashes inside psql).</div></details></div>
+<div class="faq-item"><details><summary>How do I exit psql?</summary><div class="faq-ans">Type <code>\q</code> and press Enter. Or press Ctrl+D.</div></details></div>
+<div class="faq-item"><details><summary>How do I change the output format?</summary><div class="faq-ans">Toggle expanded (vertical) mode with <code>\x</code>. Save output to a file with <code>\o filename.txt</code>. For CSV output: <code>\copy (SELECT ...) TO file.csv WITH CSV HEADER</code></div></details></div>
+</div></div>
+<div class="cta-banner"><div><h2>Want a GUI instead of the command line?</h2><p>pgAdmin 4 provides a visual interface for all psql operations.</p></div><a href="/pgadmin-windows.html" class="btn-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>pgAdmin 4 guide</a></div>
+<div style="margin-bottom:32px"><span class="section-label">Related guides</span><div class="rel-grid"><a href="/pgadmin-windows.html" class="rel-card"><div class="rel-title">pgAdmin 4 &rarr;</div><div class="rel-sub">visual alternative</div></a><a href="/pg-dump-restore-windows.html" class="rel-card"><div class="rel-title">Backup & restore &rarr;</div><div class="rel-sub">pg_dump guide</div></a><a href="/postgresql-allow-remote-connections.html" class="rel-card"><div class="rel-title">Remote connections &rarr;</div><div class="rel-sub">connect remotely</div></a></div></div></main>
+  <aside class="content-sidebar"><div class="sb-card"><div class="version-badge-label">Latest stable</div><div class="version-badge-val">18.3</div><div class="version-badge-sub">Released May 2026</div></div><div class="sb-card"><div class="sb-card-title">Install & setup</div><ul class="sb-links"><li><a href="/download-windows.html">Download PostgreSQL</a></li><li><a href="/offline-installer.html">Offline installer</a></li><li><a href="/configure-windows-service.html">Windows service</a></li><li><a href="/fix-path-issues.html">Fix PATH / psql</a></li><li><a href="/pgadmin-windows.html">pgAdmin 4</a></li><li><a href="/install-postgresql-windows-server.html">Windows Server</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Configuration</div><ul class="sb-links"><li><a href="/postgresql-config-windows.html">postgresql.conf</a></li><li><a href="/postgresql-port-5432.html">Port 5432</a></li><li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li><li><a href="/postgresql-password-windows.html">Reset password</a></li></ul></div><div class="sb-card"><div class="sb-card-title">Tools & help</div><ul class="sb-links"><li><a href="/psql-commands-windows.html" class="cur">psql commands</a></li><li><a href="/pg-dump-restore-windows.html">Backup & restore</a></li><li><a href="/postgresql-python-windows.html">Python / psycopg2</a></li><li><a href="/odbc-driver-x64-x86.html">ODBC driver</a></li><li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li><li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li><li><a href="/postgresql-windows-faq.html">FAQ</a></li></ul></div></aside>
+</div></div>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><div class="footer-logo-mark">Pg</div><span class="footer-logo-name">PostgreSQL for Windows</span></div>
+      <p class="footer-tagline">Unofficial Windows guide for PostgreSQL &mdash; download, install, configure, troubleshoot.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Install &amp; setup</div>
+      <ul class="footer-links">
+        <li><a href="/download-windows.html">Download PostgreSQL</a></li>
+        <li><a href="/offline-installer.html">Offline installer</a></li>
+        <li><a href="/configure-windows-service.html">Windows service</a></li>
+        <li><a href="/fix-path-issues.html">Fix PATH / psql</a></li>
+        <li><a href="/pgadmin-windows.html">pgAdmin 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Configuration</div>
+      <ul class="footer-links">
+        <li><a href="/postgresql-config-windows.html">postgresql.conf</a></li>
+        <li><a href="/postgresql-port-5432.html">Port 5432</a></li>
+        <li><a href="/postgresql-allow-remote-connections.html">Remote connections</a></li>
+        <li><a href="/postgresql-password-windows.html">Reset password</a></li>
+        <li><a href="/install-postgresql-windows-server.html">Windows Server</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tools &amp; help</div>
+      <ul class="footer-links">
+        <li><a href="/psql-commands-windows.html">psql commands</a></li>
+        <li><a href="/pg-dump-restore-windows.html">Backup &amp; restore</a></li>
+        <li><a href="/postgresql-not-starting-windows.html">Service not starting</a></li>
+        <li><a href="/postgresql-uninstall-windows.html">Uninstall</a></li>
+        <li><a href="/postgresql-windows-faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Not affiliated with the PostgreSQL Global Development Group. Unofficial community guide.</p>
+    <p><strong>Affiliate disclosure:</strong> Download links may be partner links.</p>
+  </div>
+</div></footer>
+<div class="cookie-bar" id="cookieBar" style="display:none">
+  <p>We use Google Analytics for anonymous traffic data. <a href="/privacy.html">Privacy policy</a></p>
+  <div class="cookie-btns"><button class="cookie-accept" id="cookieAccept">Accept</button><button class="cookie-decline" id="cookieDecline">Decline</button></div>
+</div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHLW57MR8Q"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});
+gtag('js',new Date());gtag('config','G-MHLW57MR8Q',{anonymize_ip:true,send_page_view:false});
+function grantGA(){gtag('consent','update',{analytics_storage:'granted'});gtag('event','page_view',{page_location:location.href,page_title:document.title})}
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.getElementById('cookieBar');
+  var c=localStorage.getItem('pg_consent');
+  if(!c){bar.style.display='flex'}else if(c==='1'){grantGA()}
+  document.getElementById('cookieAccept').addEventListener('click',function(){localStorage.setItem('pg_consent','1');grantGA();bar.style.display='none'});
+  document.getElementById('cookieDecline').addEventListener('click',function(){localStorage.setItem('pg_consent','0');bar.style.display='none'});
+});
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"psql Commands Cheat Sheet for Windows","description":"Essential psql commands for PostgreSQL on Windows with examples.","url":"https://postgre-sql.github.io/psql-commands-windows.html"}</script>
+<script>var el=document.getElementById("nl-home");if(el)el.classList.add("active");</script>
+</body></html>
